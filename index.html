@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API QUEST — учебный сайт об API-сервисах</title>
+<meta name="description" content="Учебный проект Гарунова Вадима (группа 141-ПМо): пиксельный интерактивный сайт об использовании API-сервисов при разработке веб-сайтов. HTML5, CSS3, NES.css, JavaScript.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f7d51d'/%3E%3Crect x='1' y='1' width='14' height='14' fill='none' stroke='%23212529' stroke-width='2'/%3E%3Ctext x='8' y='12' font-family='monospace' font-size='10' font-weight='bold' text-anchor='middle' fill='%23212529'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/nes.css@2.6.0/css/nes.min.css" rel="stylesheet">
+<style>
+/* ============ БАЗА ============ */
+:root{
+  --bg:#111118; --bg2:#17171f; --ink:#212529; --paper:#ffffff;
+  --yellow:#f7d51d; --green:#92cc41; --blue:#209cee; --red:#e76e55;
+  --text-dim:#c9c9d4; --panel:#1b1b24;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:#e8e8ee;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:16px;
+  line-height:1.65;
+  background-color:var(--bg);
+  background-image:conic-gradient(var(--bg2) 90deg, transparent 0 180deg, var(--bg2) 0 270deg, transparent 0);
+  background-size:6px 6px;
+}
+::selection{background:var(--yellow);color:#000}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#3a3a46;border:2px solid var(--bg)}
+h1,h2,h3,.pixel{font-family:'Press Start 2P',monospace;line-height:1.5}
+img{max-width:100%;height:auto}
+.sprite{display:none}
+[hidden]{display:none!important}
+
+/* ============ CRT-СКАНАЛАЙНЫ ============ */
+.scanlines{
+  position:fixed;inset:0;pointer-events:none;z-index:60;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.15) 0 1px, transparent 1px 3px);
+}
+body.crt-off .scanlines{display:none}
+.crt-toggle{
+  font-family:'Press Start 2P',monospace;font-size:8px;cursor:pointer;
+  background:transparent;color:var(--green);border:3px solid #fff;
+  padding:6px 8px;display:inline-flex;align-items:center;gap:6px;
+}
+.crt-toggle[aria-pressed="false"]{color:#6d6d78;border-color:#6d6d78}
+
+/* ============ ШАПКА ============ */
+.site-header{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:4px solid #000}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:12px 16px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.brand svg{width:26px;height:26px;color:var(--yellow)}
+.brand-name{font-family:'Press Start 2P',monospace;font-size:13px;color:#fff}
+.brand-name em{font-style:normal;color:var(--yellow)}
+.header-spacer{flex:1}
+.nav-list{display:none;list-style:none;margin:0;padding:0}
+.nav-list a{
+  display:block;font-family:'Press Start 2P',monospace;font-size:9px;
+  color:#fff;text-decoration:none;padding:9px 10px;border:3px solid transparent;
+}
+.nav-list a:hover{color:var(--yellow)}
+.nav-list a.is-active{background:var(--yellow);color:#000;border-color:#000;box-shadow:3px 3px 0 rgba(0,0,0,.6)}
+.nav-toggle{
+  display:inline-flex;flex-direction:column;justify-content:center;gap:4px;
+  width:46px;height:40px;background:var(--panel);border:3px solid #fff;cursor:pointer;padding:8px;
+}
+.nav-toggle span{display:block;height:3px;background:#fff;transition:transform .2s steps(3),opacity .2s steps(3)}
+.menu-open .nav-toggle span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.menu-open .nav-toggle span:nth-child(2){opacity:0}
+.menu-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+@media (max-width:991.98px){
+  .menu-open .nav-list{
+    display:flex;flex-direction:column;gap:8px;
+    position:absolute;left:0;right:0;top:100%;
+    background:var(--panel);border-bottom:4px solid #000;
+    padding:12px 16px;box-shadow:0 8px 0 rgba(0,0,0,.35);
+  }
+  .nav-list a{font-size:10px;padding:12px 10px;border-color:#000;background:var(--bg);box-shadow:3px 3px 0 rgba(0,0,0,.5)}
+}
+@media (min-width:992px){
+  .nav-list{display:flex;gap:4px}
+  .nav-toggle{display:none}
+}
+
+/* ============ СЕТКА СТРАНИЦЫ ============ */
+.layout{max-width:1200px;margin:0 auto;padding:18px 16px 40px;display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}
+@media (min-width:768px){.layout{grid-template-columns:minmax(0,1fr) 240px}}
+@media (min-width:992px){.layout{grid-template-columns:minmax(0,1fr) 300px;gap:30px;padding-top:26px}}
+.sidebar{display:grid;gap:22px}
+@media (min-width:768px){.sidebar{position:sticky;top:86px}}
+
+/* ============ СТРАНИЦЫ ============ */
+.page{animation:pageIn .28s steps(5) both}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.doc{background:var(--paper);color:var(--ink);padding:26px 20px 34px;border:4px solid #000;border-radius:0!important}
+@media (min-width:768px){.doc{padding:32px 34px 42px}}
+.doc h1{font-size:19px;margin:0 0 18px}
+.doc h2{font-size:13px;margin:38px 0 14px;padding-left:12px;border-left:8px solid var(--yellow)}
+.doc h3{font-size:11px;margin:26px 0 10px}
+@media (min-width:992px){.doc h1{font-size:26px}.doc h2{font-size:16px}.doc h3{font-size:12px}}
+.doc p{margin:0 0 14px}
+.lead{font-weight:600;font-size:17px}
+.doc a{color:#0a5fae;font-weight:600}
+.stage-tag{
+  display:inline-block;font-family:'Press Start 2P',monospace;font-size:10px;
+  background:var(--yellow);color:#000;padding:7px 11px;border:4px solid #000;
+  box-shadow:4px 4px 0 rgba(0,0,0,.5);margin-bottom:18px;
+}
+.doc figure{margin:22px 0}
+.doc figcaption{font-size:14px;color:#555;margin-top:8px}
+.pixel-img{image-rendering:pixelated;border:4px solid #000;box-shadow:4px 4px 0 rgba(0,0,0,.5);display:block}
+.doc ul.nes-list,.doc ol{padding-left:26px}
+.doc li{margin-bottom:8px}
+
+/* код */
+.codebox{
+  background:var(--panel);color:#e6e6e6;border:4px solid #000;border-radius:0;
+  box-shadow:4px 4px 0 rgba(0,0,0,.5);padding:16px 18px;overflow:auto;
+  font-size:14px;line-height:1.7;margin:20px 0;white-space:pre;
+}
+.codebox code{font-family:'IBM Plex Mono',monospace}
+.kw{color:var(--yellow)} .str{color:var(--green)} .fn{color:#7cc7ff} .cm{color:#8a8a96} .nm{color:#e76e55}
+
+/* разбор URL */
+.url-demo{
+  background:var(--panel);border:4px solid #000;box-shadow:4px 4px 0 rgba(0,0,0,.5);
+  padding:16px 18px;font-size:16px;word-break:break-all;margin:20px 0;
+}
+.u-proto{color:var(--yellow)} .u-host{color:#7cc7ff} .u-path{color:var(--green)} .u-query{color:var(--red)}
+.url-legend dt{font-weight:600;margin-top:8px}
+.url-legend dt::before{content:"■ ";font-size:11px}
+.url-legend dd{margin:0 0 6px;font-size:15px}
+
+/* схема клиент-сервер */
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:24px 0}
+.flow-node{background:var(--panel);color:#fff;border:4px solid #000;box-shadow:4px 4px 0 rgba(0,0,0,.4);padding:14px 16px;font-family:'Press Start 2P',monospace;font-size:10px;text-align:center;min-width:120px}
+.flow-link{display:grid;gap:6px;font-size:14px;font-weight:600;padding:6px 4px}
+.flow-link .req{color:#3f8f3f;background:#eaf6e0;border:2px solid #3f8f3f;padding:2px 8px}
+.flow-link .res{color:#8a6d00;background:#fdf6d3;border:2px solid #b98f00;padding:2px 8px}
+
+/* таблицы */
+.doc .nes-table{font-size:15px;background:#fff}
+.doc caption{caption-side:top;text-align:left;font-family:'Press Start 2P',monospace;font-size:10px;padding-bottom:10px;color:var(--ink)}
+.table-wrap{margin:20px 0}
+
+/* глоссарий */
+.gloss dt{font-family:'Press Start 2P',monospace;font-size:11px;margin-top:20px;padding:6px 8px;background:#fdf6d3;border-left:8px solid var(--yellow);display:inline-block}
+.gloss dd{margin:8px 0 0}
+
+/* навигация между стадиями */
+.stage-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;flex-wrap:wrap}
+.stage-nav .back{font-family:'Press Start 2P',monospace;font-size:9px;color:#fff;text-decoration:none}
+.stage-nav .back:hover{color:var(--yellow)}
+
+/* ============ HERO (ГЛАВНАЯ) ============ */
+.hero{background:var(--paper);color:var(--ink);padding:30px 20px;display:grid;gap:20px;border:4px solid #000;border-radius:0!important}
+@media (min-width:768px){.hero{grid-template-columns:minmax(0,1fr) 260px;align-items:center;padding:40px 36px}}
+@media (min-width:992px){.hero{grid-template-columns:minmax(0,1fr) 320px}}
+.hero h1{font-size:26px;margin:0 0 16px;color:var(--ink);text-shadow:3px 3px 0 var(--yellow)}
+@media (min-width:992px){.hero h1{font-size:36px}}
+.hero .tagline{font-size:17px;font-weight:600;margin-bottom:20px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px}
+.tv{width:100%;max-width:320px;justify-self:center}
+.blink{animation:blink 1s steps(2,start) infinite}
+@keyframes blink{to{visibility:hidden}}
+
+/* трек стадий */
+.stage-dark{background:var(--panel);border:4px solid #000;border-radius:0!important;box-shadow:6px 6px 0 rgba(0,0,0,.5)}
+.stage-track{list-style:none;margin:8px 0 0;padding:0}
+.stage-track li{position:relative;padding:0 0 20px 48px}
+.stage-track li::before{content:"";position:absolute;left:15px;top:30px;bottom:0;border-left:4px dashed #3a3a46}
+.stage-track li:last-child{padding-bottom:4px}
+.stage-track li:last-child::before{display:none}
+.stage-num{
+  position:absolute;left:0;top:0;width:32px;height:32px;display:grid;place-items:center;
+  font-family:'Press Start 2P',monospace;font-size:10px;background:var(--yellow);
+  border:3px solid #000;color:#000;
+}
+.stage-track li.cleared .stage-num{background:var(--green)}
+.stage-link{font-family:'Press Start 2P',monospace;font-size:11px;color:#fff;text-decoration:none}
+.stage-link:hover{color:var(--yellow)}
+.stage-desc{margin:6px 0 0;color:var(--text-dim);font-size:15px}
+.cleared-note{color:var(--green);font-size:12px;font-family:'Press Start 2P',monospace;margin-left:8px}
+
+/* ============ САЙДБАР ============ */
+.side-stages{list-style:none;margin:0;padding:0;font-size:16px}
+.side-stages li{margin:2px 0}
+.side-stages a{display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;padding:5px 6px}
+.side-stages a:hover{color:var(--yellow)}
+.side-stages a.done{color:var(--green)}
+.side-stages .n{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--yellow);min-width:20px}
+.side-stages a.done .n{color:var(--green)}
+.side-stages .star{width:12px;height:12px;margin-left:auto;opacity:0;flex-shrink:0}
+.side-stages a.done .star{opacity:1}
+.side-tip{background:#fff;color:var(--ink);font-size:15px}
+.side-tip .tip-body{margin:0}
+.sub-form label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.sub-form .nes-input{width:100%;font-family:inherit;font-size:15px;border-radius:0}
+.sub-form .nes-checkbox{font-size:14px;margin:12px 0}
+.sub-form .field-msg{color:var(--red);font-size:14px;font-weight:600;margin:8px 0 0}
+.sub-form .is-invalid{border-color:var(--red)}
+.monitor .m-row{margin-bottom:12px;font-size:14px}
+.monitor .m-head{display:flex;justify-content:space-between;margin-bottom:4px}
+.monitor progress{width:100%}
+
+/* ============ КАТАЛОГ ============ */
+.filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.filter-bar .nes-btn{font-size:8px;padding:8px 9px}
+.filter-count{font-weight:600;margin:6px 0 14px}
+
+/* ============ ДЕМО-ТЕРМИНАЛ ============ */
+.term{background:var(--panel);border:4px solid #000;border-radius:0!important;box-shadow:6px 6px 0 rgba(0,0,0,.5)}
+.term.with-title>.title{background-color:var(--panel)}
+.term .title{color:var(--yellow)}
+.term-log{
+  background:#0c0c11;border:3px solid #000;min-height:210px;max-height:380px;overflow:auto;
+  padding:14px;font-size:14px;line-height:1.7;margin-bottom:14px;
+}
+.term-log div{white-space:pre-wrap;word-break:break-word;animation:pageIn .2s steps(3) both;margin-bottom:10px}
+.t-cmd{color:var(--yellow)} .t-ok{color:var(--green)} .t-err{color:var(--red)}
+.t-json{color:#e6e6e6}
+.t-json .t-key{color:var(--yellow)} .t-json .t-str{color:var(--green)} .t-json .t-num{color:#7cc7ff} .t-json .t-bool{color:var(--red)}
+.t-dim{color:#8a8a96}
+.term-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.term-meta{margin-left:auto;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--text-dim)}
+
+/* ============ ВИДЕО ============ */
+.doc video{width:100%;height:auto;border:4px solid #000;box-shadow:4px 4px 0 rgba(0,0,0,.5);background:#000;display:block}
+
+/* ============ ПОДВАЛ ============ */
+.site-footer{background:var(--panel);border-top:4px solid #000;margin-top:20px}
+.footer-inner{max-width:1200px;margin:0 auto;padding:26px 16px;display:grid;gap:18px;color:var(--text-dim);font-size:15px}
+@media (min-width:768px){.footer-inner{grid-template-columns:2fr 1fr 1fr}}
+.footer-inner h3{font-size:10px;color:var(--yellow);margin:0 0 10px}
+.footer-inner ul{list-style:none;margin:0;padding:0}
+.footer-inner a{color:#fff;text-decoration:none}
+.footer-inner a:hover{color:var(--yellow)}
+.footer-heart{display:inline-flex;align-items:center;gap:5px}
+.footer-heart svg{width:12px;height:12px;color:var(--red)}
+.insert{text-align:center;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--yellow);margin:0;padding:0 16px 22px}
+
+/* ============ TOAST И BOOT ============ */
+.toast{
+  position:fixed;right:16px;bottom:16px;z-index:80;background:var(--panel);color:#fff;
+  border:4px solid #000;box-shadow:5px 5px 0 rgba(0,0,0,.5);padding:14px 18px;
+  font-family:'Press Start 2P',monospace;font-size:9px;line-height:1.6;
+  transform:translateY(150%);transition:transform .25s steps(4);
+}
+.toast.show{transform:none}
+.boot{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center}
+.boot.done{display:none}
+.boot-box{text-align:center;width:min(360px,86vw)}
+.boot-title{font-family:'Press Start 2P',monospace;font-size:20px;color:#fff;text-shadow:3px 3px 0 var(--yellow);margin:0 0 6px}
+.boot-title em{font-style:normal;color:var(--yellow);text-shadow:3px 3px 0 #fff}
+.boot-sub{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--text-dim);margin:0 0 24px}
+.boot progress{width:100%}
+.boot-skip{margin-top:18px;font-size:13px;color:var(--text-dim)}
+</style>
+</head>
+<body>
+
+<!-- Пиксельный SVG-спрайт иконок -->
+<svg xmlns="http://www.w3.org/2000/svg" class="sprite" aria-hidden="true">
+  <symbol id="i-cart" viewBox="0 0 16 16"><path fill="currentColor" fill-rule="evenodd" d="M3 2h10v4h-2v8h-6V6H3zM6 3h4v2H6zM6 14h1v1H6zM9 14h1v1H9z"/></symbol>
+  <symbol id="i-power" viewBox="0 0 16 16"><path fill="currentColor" d="M7 1h2v6H7zM2 4h2v6H2zM12 4h2v6h-2zM4 10h8v2H4zM4 2h2v2H4zM10 2h2v2h-2z"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 16 16"><path fill="currentColor" d="M7 1h2v14H7zM1 7h14v2H1zM3 3h2v2H3zM11 3h2v2h-2zM3 11h2v2H3zM11 11h2v2h-2z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 16 16"><path fill="currentColor" d="M3 2h3v1H3zM10 2h3v1h-3zM2 3h12v2H2zM3 5h10v1H3zM4 6h8v1H4zM5 7h6v1H5zM6 8h4v1H6zM7 9h2v1H7z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 16 16"><path fill="currentColor" d="M2 7h8V5l4 3-4 3V9H2z"/></symbol>
+</svg>
+
+<!-- CRT-эффект -->
+<div class="scanlines" aria-hidden="true"></div>
+
+<!-- Загрузочный экран -->
+<div class="boot" id="boot" aria-hidden="true">
+  <div class="boot-box">
+    <p class="boot-title">API<em>QUEST</em></p>
+    <p class="boot-sub">v1.0 &copy; 2025 · LOADING STAGES…</p>
+    <progress class="nes-progress is-warning" id="bootBar" value="0" max="100"></progress>
+    <p class="boot-skip" id="bootPct">0% — кликните, чтобы пропустить</p>
+  </div>
+</div>
+
+<!-- Шапка -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="brand" href="#/index.html" aria-label="API QUEST — на главную">
+      <svg aria-hidden="true"><use href="#i-cart"/></svg>
+      <span class="brand-name">API<em>QUEST</em></span>
+    </a>
+    <span class="header-spacer"></span>
+    <nav aria-label="Основная навигация">
+      <ul class="nav-list" id="siteNav">
+        <li><a href="#/index.html" data-nav="home">ГЛАВНАЯ</a></li>
+        <li><a href="#/api-basics.html" data-nav="docs">УЧЕБНИК</a></li>
+        <li><a href="#/catalog.html" data-nav="catalog">КАТАЛОГ</a></li>
+        <li><a href="#/demo.html" data-nav="demo">ДЕМО</a></li>
+        <li><a href="#/glossary.html" data-nav="glossary">ГЛОССАРИЙ</a></li>
+        <li><a href="#/about.html" data-nav="about">О ПРОЕКТЕ</a></li>
+      </ul>
+    </nav>
+    <button type="button" class="crt-toggle" id="crtToggle" aria-pressed="true" title="Переключить CRT-эффект">
+      <svg width="12" height="12" aria-hidden="true"><use href="#i-power"/></svg>CRT
+    </button>
+    <button type="button" class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="siteNav" aria-label="Открыть меню">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- ================= ОСНОВНОЙ КОНТЕНТ ================= -->
+  <main id="main">
+
+    <!-- ===== СТРАНИЦА: ГЛАВНАЯ ===== -->
+    <section class="page" id="page-home" aria-label="Главная страница" hidden>
+      <div class="nes-container hero">
+        <div>
+          <h1>API QUEST</h1>
+          <p class="tagline">Пиксельный интерактивный учебник о том, как сайты общаются с&nbsp;API-сервисами: от первого GET-запроса до живого кода на&nbsp;JavaScript.</p>
+          <div class="hero-badges">
+            <a class="nes-badge" href="#/about.html"><span class="is-dark">10 СТРАНИЦ</span></a>
+            <a class="nes-badge" href="#/catalog.html"><span class="is-dark">12 API В КАТАЛОГЕ</span></a>
+            <a class="nes-badge" href="#/demo.html"><span class="is-dark">1 ЖИВОЙ API</span></a>
+            <a class="nes-badge" href="#/glossary.html"><span class="is-dark">15 ТЕРМИНОВ</span></a>
+          </div>
+          <div class="hero-actions">
+            <a class="nes-btn is-warning" href="#/api-basics.html">START</a>
+            <button class="nes-btn is-primary" type="button" data-scroll="#stageSelect">STAGE SELECT</button>
+          </div>
+        </div>
+        <!-- Пиксельный ретро-телевизор -->
+        <svg class="tv" viewBox="0 0 200 150" role="img" aria-label="Ретро-телевизор с надписью API на экране">
+          <path d="M56 6 L88 40" stroke="#3a3a46" stroke-width="5"/>
+          <path d="M144 6 L112 40" stroke="#3a3a46" stroke-width="5"/>
+          <circle cx="52" cy="8" r="4" fill="#3a3a46"/><circle cx="148" cy="8" r="4" fill="#3a3a46"/>
+          <rect x="16" y="42" width="168" height="92" fill="#2f2f3a" stroke="#000" stroke-width="4"/>
+          <rect x="26" y="52" width="112" height="70" fill="#0c2416" stroke="#000" stroke-width="3"/>
+          <text x="34" y="96" font-family="'Press Start 2P',monospace" font-size="17" fill="#92cc41">API</text>
+          <rect class="blink" x="86" y="82" width="11" height="15" fill="#92cc41"/>
+          <rect x="148" y="56" width="26" height="5" fill="#575764"/>
+          <rect x="148" y="66" width="26" height="5" fill="#575764"/>
+          <rect x="148" y="76" width="26" height="5" fill="#575764"/>
+          <rect x="150" y="94" width="22" height="14" fill="#f7d51d" stroke="#000" stroke-width="3"/>
+          <rect x="150" y="114" width="22" height="8" fill="#e76e55" stroke="#000" stroke-width="3"/>
+          <rect x="32" y="136" width="18" height="10" fill="#2f2f3a" stroke="#000" stroke-width="3"/>
+          <rect x="150" y="136" width="18" height="10" fill="#2f2f3a" stroke="#000" stroke-width="3"/>
+        </svg>
+      </div>
+
+      <div class="nes-container stage-dark" style="margin-top:26px;padding:24px 20px 28px">
+        <h2 id="stageSelect" style="font-size:13px;color:var(--yellow);margin:0 0 6px">ВЫБОР СТАДИИ</h2>
+        <p style="color:var(--text-dim);font-size:15px;margin:0 0 18px">Пройдите стадии по порядку — посещённые отмечаются звёздочкой и сохраняются в браузере.</p>
+        <ol class="stage-track">
+          <li data-stage="/api-basics.html">
+            <span class="stage-num" aria-hidden="true">1</span>
+            <a class="stage-link" href="#/api-basics.html">ЧТО ТАКОЕ API<span class="cleared-note" hidden>CLEARED!</span></a>
+            <p class="stage-desc">Контракт между программами. Картридж, консоль и порт между ними.</p>
+          </li>
+          <li data-stage="/rest-http.html">
+            <span class="stage-num" aria-hidden="true">2</span>
+            <a class="stage-link" href="#/rest-http.html">REST И HTTP<span class="cleared-note" hidden>CLEARED!</span></a>
+            <p class="stage-desc">Методы, коды ответов и анатомия URL — язык, на котором говорит веб.</p>
+          </li>
+          <li data-stage="/data-formats.html">
+            <span class="stage-num" aria-hidden="true">3</span>
+            <a class="stage-link" href="#/data-formats.html">JSON И XML<span class="cleared-note" hidden>CLEARED!</span></a>
+            <p class="stage-desc">Форматы данных: почему JSON победил и как его читать из JS.</p>
+          </li>
+          <li data-stage="/auth-keys.html">
+            <span class="stage-num" aria-hidden="true">4</span>
+            <a class="stage-link" href="#/auth-keys.html">КЛЮЧИ И ТОКЕНЫ<span class="cleared-note" hidden>CLEARED!</span></a>
+            <p class="stage-desc">API-ключи, OAuth и почему секреты нельзя хранить во фронтенде.</p>
+          </li>
+          <li data-stage="/frontend.html">
+            <span class="stage-num" aria-hidden="true">5</span>
+            <a class="stage-link" href="#/frontend.html">ИНТЕГРАЦИЯ НА ФРОНТЕНДЕ<span class="cleared-note" hidden>CLEARED!</span></a>
+            <p class="stage-desc">fetch, async/await, обработка ошибок, CORS и состояния загрузки.</p>
+          </li>
+          <li data-stage="/catalog.html">
+            <span class="stage-num" aria-hidden="true">6</span>
+            <a class="stage-link" href="#/catalog.html">КАТАЛОГ ПУБЛИЧНЫХ API<span class="cleared-note" hidden>CLEARED!</span></a>
+            <p class="stage-desc">12 реальных сервисов с фильтрами по категориям — для практики.</p>
+          </li>
+          <li data-stage="/demo.html">
+            <span class="stage-num" aria-hidden="true">7</span>
+            <a class="stage-link" href="#/demo.html">ЖИВАЯ ЛАБОРАТОРИЯ<span class="cleared-note" hidden>CLEARED!</span></a>
+            <p class="stage-desc">Настоящий запрос к API прямо со страницы — с логом и статусами.</p>
+          </li>
+          <li data-stage="/glossary.html">
+            <span class="stage-num" aria-hidden="true">8</span>
+            <a class="stage-link" href="#/glossary.html">ГЛОССАРИЙ<span class="cleared-note" hidden>CLEARED!</span></a>
+            <p class="stage-desc">15 терминов, которые нужно знать, чтобы говорить как бэкендер.</p>
+          </li>
+          <li data-stage="/about.html">
+            <span class="stage-num" aria-hidden="true">9</span>
+            <a class="stage-link" href="#/about.html">О ПРОЕКТЕ<span class="cleared-note" hidden>CLEARED!</span></a>
+            <p class="stage-desc">Автор, стек технологий и чек-лист требований задания.</p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="doc" style="margin-top:26px">
+        <h2>Почему это важно</h2>
+        <p>Почти каждый современный сайт — это клиент чужих API: виджет погоды на главной, кнопка «Войти через…», карта, онлайн-оплата, комментарии, курс валют. Уметь интегрировать API-сервисы — базовый навык фронтенд-разработчика, без которого не собирается ни один реальный проект.</p>
+        <ul class="nes-list is-disc">
+          <li><strong>Данные.</strong> Контент, курсы валют, погода и товары приходят на сайт из внешних сервисов.</li>
+          <li><strong>Функции.</strong> Авторизация, оплата, карты и поиск реализуются через API и не пишутся с нуля.</li>
+          <li><strong>Архитектура.</strong> Даже свой бэкенд для фронтендера — это просто API, и работать с ним нужно так же.</li>
+        </ul>
+        <h2>Как проходить квест</h2>
+        <ol>
+          <li>Читайте стадии по порядку: каждая опирается на предыдущую.</li>
+          <li>В конце стадий есть навигация «назад/вперёд» — прогресс сохраняется.</li>
+          <li>На 7-й стадии отправьте настоящий запрос к API прямо из браузера.</li>
+          <li>Загляните в каталог API и выберите сервис для собственного мини-проекта.</li>
+        </ol>
+        <figure>
+          <img class="pixel-img" src="https://picsum.photos/seed/apiquest-network/800/360.jpg"
+               srcset="https://picsum.photos/seed/apiquest-network/400/180.jpg 400w,
+                       https://picsum.photos/seed/apiquest-network/800/360.jpg 800w,
+                       https://picsum.photos/seed/apiquest-network/1200/540.jpg 1200w"
+               sizes="(min-width: 992px) 640px, (min-width: 768px) 78vw, 92vw"
+               width="800" height="360" loading="lazy" decoding="async"
+               data-fb="apiquest-network"
+               alt="Пиксельная иллюстрация: сервер соединён линиями с тремя клиентами"
+               title="Сеть сервисов, связанных через API">
+          <figcaption>Веб — это сеть сервисов, которые договариваются через API. Если внешняя иллюстрация недоступна, автоматически показывается встроенная пиксельная SVG-версия.</figcaption>
+        </figure>
+      </div>
+
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <span></span>
+        <a class="nes-btn is-warning" href="#/api-basics.html">К STAGE 01 <svg width="12" height="12" style="vertical-align:-1px" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </nav>
+    </section>
+
+    <!-- ===== STAGE 01: ЧТО ТАКОЕ API ===== -->
+    <section class="page" id="page-api-basics" aria-labelledby="t-api-basics" hidden>
+      <article class="nes-container doc">
+        <span class="stage-tag">STAGE 01</span>
+        <h1 id="t-api-basics">Что такое API</h1>
+        <p class="lead">API (Application Programming Interface) — это контракт, по которому одна программа может попросить другую сделать что-то или отдать данные, не зная, как та устроена внутри.</p>
+        <p>Лучше всего суть API объясняет сама игровая приставка. Консоль понятия не имеет, что записано внутри картриджа: гонки это или платформер. Но и картридж, и консоль согласовали <strong>протокол подключения</strong> — форму разъёма и порядок обмена данными. Вставил картридж — играешь. Порт картриджа — это и есть API в чистом виде: устойчивый договор между двумя системами.</p>
+        <p>В веб-разработке роль консоли играет ваш сайт (клиент), а роль картриджа — внешний сервис (сервер). Ваш код не знает, на каком языке написан сервер и какая у него база данных, — он просто отправляет запрос по договорённому формату и получает ответ.</p>
+
+        <h2>API вокруг нас</h2>
+        <ul class="nes-list is-disc">
+          <li>Виджет погоды на городском портале берёт данные из API метеослужбы.</li>
+          <li>Кнопка «Войти через VK» — это вызов API авторизации соцсети.</li>
+          <li>Онлайн-оплата на сайте — обращение к API платёжного шлюза.</li>
+          <li>Интерактивная карта — API картографического сервиса.</li>
+          <li>Курс валют в шапке сайта — API финансового агрегатора.</li>
+        </ul>
+
+        <h2>Клиент и сервер</h2>
+        <p>Типовое веб-API работает по схеме «запрос — ответ» поверх протокола HTTP. Клиент формирует запрос, сервер обрабатывает его и возвращает ответ с данными и кодом статуса.</p>
+        <div class="flow" role="img" aria-label="Схема: браузер отправляет HTTP-запрос к API-серверу и получает ответ с данными">
+          <div class="flow-node">БРАУЗЕР<br>КЛИЕНТ</div>
+          <div class="flow-link">
+            <span class="req">→ GET /api/facts</span>
+            <span class="res">← 200 OK + JSON</span>
+          </div>
+          <div class="flow-node">API-СЕРВЕР</div>
+        </div>
+        <p>Запрос и ответ — это просто текстовые сообщения со строгой структурой: служебные заголовки (headers) и, при необходимости, тело (body) с данными. Фронтендер должен уметь читать обе части.</p>
+
+        <h2>Виды API по доступу</h2>
+        <ul class="nes-list is-disc">
+          <li><strong>Приватные</strong> — работают только внутри одной компании: между бэкендом, мобильным приложением и сайтом.</li>
+          <li><strong>Партнёрские</strong> — доступны проверенным партнёрам по персональным ключам: API платёжных систем, маркетплейсов.</li>
+          <li><strong>Публичные (open API)</strong> — открыты всем желающим, часто бесплатно или с лимитами: справочники, погода, энциклопедии. Именно с них начинают обучение.</li>
+        </ul>
+        <p>В этом квесте мы работаем именно с публичными API: с ними можно экспериментировать напрямую из браузера. Полный список сервисов для практики ждёт вас в <a href="#/catalog.html">каталоге 6-й стадии</a>.</p>
+
+        <figure>
+          <img class="pixel-img" src="https://picsum.photos/seed/api-port/800/340.jpg"
+               srcset="https://picsum.photos/seed/api-port/400/170.jpg 400w,
+                       https://picsum.photos/seed/api-port/800/340.jpg 800w,
+                       https://picsum.photos/seed/api-port/1200/510.jpg 1200w"
+               sizes="(min-width: 992px) 640px, (min-width: 768px) 78vw, 92vw"
+               width="800" height="340" loading="lazy" decoding="async"
+               data-fb="api-port"
+               alt="Пиксельная иллюстрация: два устройства, соединённые кабелем"
+               title="API соединяет две программы">
+          <figcaption>API — это «кабель» между двумя программами: важно только то, что проходит по нему. Если внешняя иллюстрация недоступна, автоматически показывается встроенная SVG-версия.</figcaption>
+        </figure>
+
+        <h2>Итог стадии</h2>
+        <p>API — это не библиотека и не база данных, а <strong>договор об обмене сообщениями</strong>. Как только вы поймёте формат этого договора (HTTP-методы, URL, заголовки, тело ответа), любой новый API станет для вас просто ещё одним картриджем в коллекции.</p>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="#/index.html">&lt;&lt; НА ГЛАВНУЮ</a>
+        <a class="nes-btn is-warning" href="#/rest-http.html">STAGE 02 <svg width="12" height="12" style="vertical-align:-1px" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </nav>
+    </section>
+
+    <!-- ===== STAGE 02: REST И HTTP ===== -->
+    <section class="page" id="page-rest-http" aria-labelledby="t-rest" hidden>
+      <article class="nes-container doc">
+        <span class="stage-tag">STAGE 02</span>
+        <h1 id="t-rest">REST и HTTP</h1>
+        <p class="lead">HTTP — протокол, на котором браузер общается с серверами. REST — набор правил, как строить API поверх HTTP так, чтобы это было предсказуемо и удобно.</p>
+
+        <h2>Анатомия URL</h2>
+        <p>Каждый запрос адресуется URL. Разберём типичный адрес API по частям:</p>
+        <p class="url-demo"><span class="u-proto">https://</span><span class="u-host">api.example.com</span><span class="u-path">/v1/facts</span><span class="u-query">?limit=3</span></p>
+        <dl class="url-legend">
+          <dt style="color:#8a6d00">https://</dt><dd>Протокол и гарантия шифрования. Публичные API работают только по HTTPS.</dd>
+          <dt style="color:#0a5fae">api.example.com</dt><dd>Домен сервера, который принимает запросы.</dd>
+          <dt style="color:#3f8f3f">/v1/facts</dt><dd>Путь к ресурсу (endpoint). Версия <code>v1</code> позволяет менять API, не ломая старых клиентов.</dd>
+          <dt style="color:#b3403a">?limit=3</dt><dd>Query-параметры — настройки запроса: сколько отдать, как отфильтровать.</dd>
+        </dl>
+
+        <h2>HTTP-методы</h2>
+        <p>Метод сообщает серверу, <em>что именно</em> вы хотите сделать с ресурсом. Запомните пять основных:</p>
+        <div class="table-wrap">
+          <div class="nes-table-responsive">
+            <table class="nes-table is-bordered is-centered">
+              <caption>Таблица 1. Основные HTTP-методы</caption>
+              <thead>
+                <tr><th scope="col">Метод</th><th scope="col">Назначение</th><th scope="col">Идемпотентен</th><th scope="col">Пример</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">GET</th><td>Получить данные, ничего не меняя</td><td>Да</td><td>GET /api/facts</td></tr>
+                <tr><th scope="row">POST</th><td>Создать новый ресурс</td><td>Нет</td><td>POST /api/comments</td></tr>
+                <tr><th scope="row">PUT</th><td>Полностью заменить ресурс</td><td>Да</td><td>PUT /api/users/42</td></tr>
+                <tr><th scope="row">PATCH</th><td>Частично изменить ресурс</td><td>Нет</td><td>PATCH /api/users/42</td></tr>
+                <tr><th scope="row">DELETE</th><td>Удалить ресурс</td><td>Да</td><td>DELETE /api/comments/7</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p><strong>Идемпотентность</strong> означает, что повторный запрос не меняет результат: сто раз отправленный DELETE удалит ресурс так же, как один. А вот сто POST-запросов создадут сто комментариев.</p>
+
+        <h2>Коды ответов</h2>
+        <p>Каждый ответ сервера несёт трёхзначный код статуса — по нему фронтенд понимает, что произошло. Первая цифра задаёт класс ответа.</p>
+        <div class="table-wrap">
+          <div class="nes-table-responsive">
+            <table class="nes-table is-bordered is-centered">
+              <caption>Таблица 2. Коды статусов, которые встречаются чаще всего</caption>
+              <thead>
+                <tr><th scope="col">Код</th><th scope="col">Значение</th><th scope="col">Что делать фронтенду</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">200</th><td>OK — успех</td><td>Обработать данные из тела ответа</td></tr>
+                <tr><th scope="row">201</th><td>Created — ресурс создан</td><td>Обновить интерфейс, показать новый элемент</td></tr>
+                <tr><th scope="row">204</th><td>No Content — успех без тела</td><td>Ничего не парсить</td></tr>
+                <tr><th scope="row">301</th><td>Перемещён навсегда</td><td>Браузер перейдёт сам по новому адресу</td></tr>
+                <tr><th scope="row">400</th><td>Bad Request — ошибка в запросе</td><td>Проверить параметры и валидацию формы</td></tr>
+                <tr><th scope="row">401</th><td>Не авторизован</td><td>Отправить пользователя на вход</td></tr>
+                <tr><th scope="row">403</th><td>Доступ запрещён</td><td>Показать сообщение о правах</td></tr>
+                <tr><th scope="row">404</th><td>Не найдено</td><td>Показать заглушку (как наша страница 404!)</td></tr>
+                <tr><th scope="row">429</th><td>Слишком много запросов</td><td>Подождать и повторить позже</td></tr>
+                <tr><th scope="row">500</th><td>Ошибка на сервере</td><td>Сообщить пользователю и залогировать</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2>Принципы REST</h2>
+        <ol>
+          <li><strong>Клиент — сервер.</strong> Логика разделена: фронтенд не знает о хранении данных, сервер — об отрисовке.</li>
+          <li><strong>Отсутствие состояния (stateless).</strong> Каждый запрос самодостаточен: сервер не помнит предыдущие.</li>
+          <li><strong>Ресурсы и адреса.</strong> URL — это существительные (<code>/users/42</code>), действия выражаются методами.</li>
+          <li><strong>Единообразие интерфейса.</strong> Одинаковые структуры ответов, стандартные коды статусов, предсказуемые названия.</li>
+          <li><strong>Кэшируемость.</strong> Ответы помечаются как кэшируемые, чтобы не гонять одни и те же данные.</li>
+        </ol>
+        <p>Проверить себя можно на 7-й стадии: терминал покажет и метод, и статус, и тело реального ответа.</p>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="#/api-basics.html">&lt;&lt; STAGE 01</a>
+        <a class="nes-btn is-warning" href="#/data-formats.html">STAGE 03 <svg width="12" height="12" style="vertical-align:-1px" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </nav>
+    </section>
+
+    <!-- ===== STAGE 03: JSON И XML ===== -->
+    <section class="page" id="page-data-formats" aria-labelledby="t-formats" hidden>
+      <article class="nes-container doc">
+        <span class="stage-tag">STAGE 03</span>
+        <h1 id="t-formats">Форматы данных: JSON и XML</h1>
+        <p class="lead">Чтобы клиент и сервер поняли друг друга, данные передаются в согласованном текстовом формате. Сегодня почти весь веб говорит на JSON, но XML всё ещё встречается в legacy-системах и SOAP-сервисах.</p>
+
+        <h2>JSON — JavaScript Object Notation</h2>
+        <p>JSON построен на синтаксисе самого JavaScript: объекты в фигурных скобках, массивы в квадратных, строки в двойных кавычках. Вот так выглядит типичный ответ API:</p>
+        <pre class="codebox"><code>{
+  <span class="str">"userId"</span>: 42,
+  <span class="str">"fact"</span>: <span class="str">"Кошки спят около 16 часов в сутки"</span>,
+  <span class="str">"length"</span>: 38,
+  <span class="str">"tags"</span>: [<span class="str">"cats"</span>, <span class="str">"sleep"</span>],
+  <span class="str">"verified"</span>: <span class="kw">true</span>,
+  <span class="str">"source"</span>: <span class="kw">null</span>
+}</code></pre>
+
+        <h2>XML — старший брат</h2>
+        <p>XML описывает данные вложенными тегами. Он многословнее, но имеет схемы валидации и до сих пор применяется в банковских и государственных интеграциях:</p>
+        <pre class="codebox"><code><span class="kw">&lt;response&gt;</span>
+  <span class="kw">&lt;userId&gt;</span>42<span class="kw">&lt;/userId&gt;</span>
+  <span class="kw">&lt;fact&gt;</span>Кошки спят около 16 часов в сутки<span class="kw">&lt;/fact&gt;</span>
+  <span class="kw">&lt;verified&gt;</span>true<span class="kw">&lt;/verified&gt;</span>
+<span class="kw">&lt;/response&gt;</span></code></pre>
+
+        <h2>Сравнение</h2>
+        <div class="table-wrap">
+          <div class="nes-table-responsive">
+            <table class="nes-table is-bordered is-centered">
+              <caption>Таблица 3. JSON против XML</caption>
+              <thead>
+                <tr><th scope="col">Критерий</th><th scope="col">JSON</th><th scope="col">XML</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">Синтаксис</th><td>Объекты и массивы</td><td>Вложенные теги</td></tr>
+                <tr><th scope="row">Размер</th><td>Компактный</td><td>Многословный</td></tr>
+                <tr><th scope="row">Парсинг в JS</th><td>Нативный, мгновенный</td><td>Требует DOM-парсера</td></tr>
+                <tr><th scope="row">Читаемость</th><td>Высокая</td><td>Хорошая, но шумная</td></tr>
+                <tr><th scope="row">Где встречается</th><td>Подавляющее большинство современных API</td><td>SOAP, банковские и гос-интеграции</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2>JSON в JavaScript</h2>
+        <p>Два метода, которые нужно знать наизусть: <code>JSON.parse()</code> превращает текст в объект, <code>JSON.stringify()</code> — объект обратно в текст (например, для отправки на сервер).</p>
+        <pre class="codebox"><code><span class="cm">// текст ответа → объект</span>
+<span class="kw">const</span> data = JSON.<span class="fn">parse</span>(<span class="str">'{"fact":"Кошки мурлычут"}'</span>);
+console.<span class="fn">log</span>(data.fact); <span class="cm">// "Кошки мурлычут"</span>
+
+<span class="cm">// объект → текст (с отступами для отладки)</span>
+<span class="kw">const</span> text = JSON.<span class="fn">stringify</span>(data, <span class="kw">null</span>, 2);</code></pre>
+        <p>Метод <code>response.json()</code> объекта fetch делает parse за вас — мы используем его на 7-й стадии в живой лаборатории.</p>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="#/rest-http.html">&lt;&lt; STAGE 02</a>
+        <a class="nes-btn is-warning" href="#/auth-keys.html">STAGE 04 <svg width="12" height="12" style="vertical-align:-1px" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </nav>
+    </section>
+
+    <!-- ===== STAGE 04: КЛЮЧИ И ТОКЕНЫ ===== -->
+    <section class="page" id="page-auth-keys" aria-labelledby="t-auth" hidden>
+      <article class="nes-container doc">
+        <span class="stage-tag">STAGE 04</span>
+        <h1 id="t-auth">Ключи и токены</h1>
+        <p class="lead">API нужно знать, кто к нему обращается: чтобы считать лимиты, тарифицировать использование и защищать данные. Для этого используются ключи и токены.</p>
+
+        <h2>Три способа представиться</h2>
+        <ul class="nes-list is-disc">
+          <li><strong>API-ключ</strong> — длинная строка вида <code>a1b2c3…</code>, которую сервис выдаёт после регистрации. Передаётся в заголовке или query-параметре. Подходит для серверных вызовов и учебных проектов.</li>
+          <li><strong>Bearer-токен</strong> — временный пропуск, который клиент получает после входа пользователя. Передаётся в заголовке <code>Authorization: Bearer …</code>.</li>
+          <li><strong>OAuth 2.0</strong> — протокол делегированного доступа: пользователь разрешает сайту читать, например, свой профиль в соцсети, не отдавая пароль. Так работают кнопки «Войти через…».</li>
+        </ul>
+
+        <h2>Главное правило безопасности</h2>
+        <p>Всё, что попадает во фронтенд, пользователь может увидеть в DevTools. Поэтому секретный ключ нельзя класть в HTML, CSS или JS — он должен жить на сервере, который делает запросы к API за клиента (сервер-прокси).</p>
+        <h3>Как делать не надо</h3>
+        <pre class="codebox"><code><span class="cm">// КЛЮЧ ВИДЕН ВСЕМ — откройте исходники страницы!</span>
+<span class="kw">const</span> API_KEY = <span class="str">"sk_live_51H8xQ…"</span>;
+<span class="fn">fetch</span>(<span class="str">"https://api.pay.example/v1/charge?key="</span> + API_KEY);</code></pre>
+        <h3>Как делать правильно</h3>
+        <pre class="codebox"><code><span class="cm">// Фронтенд обращается к СВОЕМУ серверу…</span>
+<span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"/api/weather?city=moscow"</span>);
+
+<span class="cm">// …а сервер добавляет ключ и зовёт внешний API.</span>
+<span class="cm">// Ключ хранится в переменной окружения, не в коде.</span></code></pre>
+
+        <h2>Лимиты запросов (rate limit)</h2>
+        <p>Публичные API ограничивают частоту обращений: например, «60 запросов в час с одного IP». При превышении сервер отвечает кодом <a href="#/rest-http.html">429</a>, а в заголовках часто сообщает, когда лимит обновится. В учебных проектах кэшируйте ответы и не запускайте запросы в цикле.</p>
+
+        <h2>Чек-лист безопасности</h2>
+        <ul class="nes-list is-disc">
+          <li>Ключи — только в переменных окружения на сервере, никогда — в клиентском коде и в Git.</li>
+          <li>Для публичных данных без ключа используйте сервисы из каталога 6-й стадии.</li>
+          <li>Ограничивайте ключи по домену или IP, если сервис это позволяет.</li>
+          <li>Обрабатывайте 401/403: предлагайте пользователю войти, а не показывайте «сломанную» страницу.</li>
+        </ul>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="#/data-formats.html">&lt;&lt; STAGE 03</a>
+        <a class="nes-btn is-warning" href="#/frontend.html">STAGE 05 <svg width="12" height="12" style="vertical-align:-1px" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </nav>
+    </section>
+
+    <!-- ===== STAGE 05: ИНТЕГРАЦИЯ НА ФРОНТЕНДЕ ===== -->
+    <section class="page" id="page-frontend" aria-labelledby="t-frontend" hidden>
+      <article class="nes-container doc">
+        <span class="stage-tag">STAGE 05</span>
+        <h1 id="t-frontend">Интеграция на фронтенде</h1>
+        <p class="lead">Инструмент номер один для работы с API в браузере — функция <code>fetch()</code>. Она есть в каждом современном браузере и возвращает промис с ответом сервера.</p>
+
+        <h2>Базовый шаблон</h2>
+        <pre class="codebox"><code><span class="kw">async function</span> <span class="fn">loadFact</span>() {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://catfact.ninja/fact'</span>);
+
+    <span class="cm">// fetch НЕ бросает ошибку на 404/500 — проверяем сами</span>
+    <span class="kw">if</span> (!res.ok) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">'HTTP '</span> + res.status);
+
+    <span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();
+    console.<span class="fn">log</span>(data.fact);
+
+  } <span class="kw">catch</span> (err) {
+    <span class="cm">// сюда попадают и сетевые сбои, и наши throw</span>
+    console.<span class="fn">error</span>(<span class="str">'Запрос не удался:'</span>, err.message);
+  }
+}</code></pre>
+        <h2>Что здесь происходит</h2>
+        <ol>
+          <li><code>fetch(url)</code> отправляет GET-запрос и возвращает промис.</li>
+          <li><code>res.ok</code> — проверяем статус: всё в диапазоне 200–299?</li>
+          <li><code>res.json()</code> читает тело и парсит JSON во второй промис.</li>
+          <li><code>try/catch</code> ловит сетевые ошибки (нет интернета, блокировка, CORS).</li>
+        </ol>
+
+        <h2>CORS: почему «чужой» API может не отвечать</h2>
+        <p>Браузеры по умолчанию запрещают странице читать ответы с другого домена. Сервер разрешает это специальным заголовком <code>Access-Control-Allow-Origin</code>. Открытые API (как тот, что мы используем в демо) присылают его всегда; если сервис его не отдаёт — запрос делают через свой серверный прокси.</p>
+
+        <h2>Состояния загрузки</h2>
+        <p>Пока запрос идёт (он занимает сотни миллисекунд), интерфейс не должен «замереть». Минимальный набор состояний: <strong>загрузка</strong> (спиннер или прогресс-бар), <strong>успех</strong> (данные), <strong>ошибка</strong> (сообщение и кнопка «повторить»). Посмотрите на терминал 7-й стадии — там реализованы все три.</p>
+
+        <h2>Видеоразбор</h2>
+        <p>Короткий видеофрагмент, встроенный тегом HTML5 <code>&lt;video&gt;</code> — тот же способ, которым на страницы встраиваются видеохостинги и веб-плееры. У клипа два источника: если первый недоступен, браузер автоматически пробует второй — так работает механизм <code>&lt;source&gt;</code>:</p>
+        <figure>
+          <video id="apiVideo" controls preload="metadata" width="640" height="360"
+                 poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 36'%3E%3Crect width='64' height='36' fill='%230c2416'/%3E%3Crect x='2' y='2' width='60' height='32' fill='none' stroke='%2392cc41' stroke-width='1' opacity='0.35'/%3E%3Ctext x='6' y='23' font-family='monospace' font-size='13' fill='%2392cc41'%3EAPI%3C/text%3E%3Crect x='30' y='13' width='6' height='11' fill='%2392cc41' opacity='0.8'/%3E%3Crect x='42' y='26' width='14' height='3' fill='%2392cc41' opacity='0.5'/%3E%3C/svg%3E">
+            <source src="https://mdn.github.io/shared-assets/videos/flower.mp4" type="video/mp4">
+            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            Ваш браузер не поддерживает встроенное видео.
+          </video>
+          <p id="videoNote" hidden style="color:var(--red);font-size:14px;font-weight:600;margin:8px 0 0">Видео не загрузилось — проверьте подключение к интернету и обновите страницу.</p>
+          <figcaption>Открытые тестовые клипы (Blender Foundation, лицензия CC), встроенные тегом &lt;video&gt;. Постер — встроенный SVG, поэтому плеер не выглядит «пустым» даже без сети.</figcaption>
+        </figure>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="#/auth-keys.html">&lt;&lt; STAGE 04</a>
+        <a class="nes-btn is-warning" href="#/catalog.html">STAGE 06 <svg width="12" height="12" style="vertical-align:-1px" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </nav>
+    </section>
+
+    <!-- ===== STAGE 06: КАТАЛОГ API ===== -->
+    <section class="page" id="page-catalog" aria-labelledby="t-catalog" hidden>
+      <article class="nes-container doc">
+        <span class="stage-tag">STAGE 06</span>
+        <h1 id="t-catalog">Каталог публичных API</h1>
+        <p class="lead">Двенадцать реальных API-сервисов, с которыми можно работать без бэкенда и почти без затрат. Используйте фильтр по категориям, чтобы найти сервис для своего мини-проекта.</p>
+
+        <div class="filter-bar" role="group" aria-label="Фильтр каталога по категориям">
+          <button class="nes-btn is-warning filter-btn" type="button" data-cat="all">ВСЕ</button>
+          <button class="nes-btn filter-btn" type="button" data-cat="dev">РАЗРАБОТКА</button>
+          <button class="nes-btn filter-btn" type="button" data-cat="games">ИГРЫ</button>
+          <button class="nes-btn filter-btn" type="button" data-cat="data">ДАННЫЕ</button>
+          <button class="nes-btn filter-btn" type="button" data-cat="content">КОНТЕНТ</button>
+          <button class="nes-btn filter-btn" type="button" data-cat="weather">ПОГОДА</button>
+          <button class="nes-btn filter-btn" type="button" data-cat="finance">ФИНАНСЫ</button>
+          <button class="nes-btn filter-btn" type="button" data-cat="space">КОСМОС</button>
+        </div>
+        <p class="filter-count">Найдено сервисов: <span id="filterCount">12</span></p>
+        <div class="table-wrap">
+          <div class="nes-table-responsive">
+            <table class="nes-table is-bordered is-centered" id="apiTable">
+              <caption>Таблица 4. Двенадцать открытых API для практики</caption>
+              <thead>
+                <tr><th scope="col">Сервис</th><th scope="col">Категория</th><th scope="col">Ключ</th><th scope="col">CORS</th><th scope="col">Что умеет</th></tr>
+              </thead>
+              <tbody>
+                <tr data-cat="dev"><th scope="row"><a href="https://jsonplaceholder.typicode.com" target="_blank" rel="noopener">JSONPlaceholder</a></th><td>Разработка</td><td>Не нужен</td><td>Да</td><td>Фейковый REST для прототипов: посты, задачи, пользователи</td></tr>
+                <tr data-cat="dev"><th scope="row"><a href="https://docs.github.com/rest" target="_blank" rel="noopener">GitHub REST</a></th><td>Разработка</td><td>Не нужен*</td><td>Да</td><td>Репозитории, профили, коммиты; с ключом лимиты выше</td></tr>
+                <tr data-cat="games"><th scope="row"><a href="https://pokeapi.co" target="_blank" rel="noopener">PokeAPI</a></th><td>Игры</td><td>Не нужен</td><td>Да</td><td>Энциклопедия покемонов: характеристики, спрайты, способности</td></tr>
+                <tr data-cat="data"><th scope="row"><a href="https://openlibrary.org/developers/api" target="_blank" rel="noopener">Open Library</a></th><td>Данные</td><td>Не нужен</td><td>Да</td><td>Миллионы книг: названия, авторы, обложки, ISBN</td></tr>
+                <tr data-cat="data"><th scope="row"><a href="https://restcountries.com" target="_blank" rel="noopener">REST Countries</a></th><td>Данные</td><td>Не нужен</td><td>Да</td><td>Страны мира: столицы, флаги, население, валюты</td></tr>
+                <tr data-cat="content"><th scope="row"><a href="https://catfact.ninja" target="_blank" rel="noopener">Cat Facts</a></th><td>Контент</td><td>Не нужен</td><td>Да</td><td>Случайные факты о кошках — работает в демо 7-й стадии</td></tr>
+                <tr data-cat="content"><th scope="row"><a href="https://dog.ceo/dog-api/" target="_blank" rel="noopener">Dog CEO</a></th><td>Контент</td><td>Не нужен</td><td>Да</td><td>Фото собак по 90+ породам</td></tr>
+                <tr data-cat="content"><th scope="row"><a href="https://www.themealdb.com/api.php" target="_blank" rel="noopener">TheMealDB</a></th><td>Контент</td><td>Тестовый</td><td>Да</td><td>Рецепты блюд с фото и пошаговыми инструкциями</td></tr>
+                <tr data-cat="weather"><th scope="row"><a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a></th><td>Погода</td><td>Не нужен</td><td>Да</td><td>Текущая погода и прогнозы по координатам, без регистрации</td></tr>
+                <tr data-cat="finance"><th scope="row"><a href="https://www.exchangerate-api.com" target="_blank" rel="noopener">ExchangeRate-API</a></th><td>Финансы</td><td>Не нужен*</td><td>Да</td><td>Курсы валют; открытый эндпоинт обновляется ежедневно</td></tr>
+                <tr data-cat="finance"><th scope="row"><a href="https://www.coingecko.com/en/api" target="_blank" rel="noopener">CoinGecko</a></th><td>Финансы</td><td>Не нужен*</td><td>Да</td><td>Цены и статистика криптовалют (демо-лимит запросов)</td></tr>
+                <tr data-cat="space"><th scope="row"><a href="https://wheretheiss.at/w/1.0" target="_blank" rel="noopener">Where the ISS at?</a></th><td>Космос</td><td>Не нужен</td><td>Да</td><td>Текущие координаты МКС, обновление раз в секунду</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p style="font-size:14px;color:#555">* Сервис можно пробовать без ключа, но регистрация расширяет лимиты. Колонка «CORS» отвечает на вопрос: пустит ли сервер запросы прямо из браузера — если «нет», нужен сервер-прокси (см. 4-ю стадию).</p>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="#/frontend.html">&lt;&lt; STAGE 05</a>
+        <a class="nes-btn is-warning" href="#/demo.html">STAGE 07 <svg width="12" height="12" style="vertical-align:-1px" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </nav>
+    </section>
+
+    <!-- ===== STAGE 07: ЖИВАЯ ЛАБОРАТОРИЯ ===== -->
+    <section class="page" id="page-demo" aria-labelledby="t-demo" hidden>
+      <article class="nes-container doc">
+        <span class="stage-tag">STAGE 07</span>
+        <h1 id="t-demo">Живая лаборатория</h1>
+        <p class="lead">Единственная страница курса, где запрос уходит по-настоящему. Кнопки ниже обращаются к открытому API <a href="https://catfact.ninja" target="_blank" rel="noopener">catfact.ninja</a> прямо из вашего браузера, а терминал фиксирует всё: команду, HTTP-статус, время и тело ответа.</p>
+
+        <div class="nes-container term with-title" style="padding:20px 18px 22px">
+          <p class="title">API-TERMINAL v1.0</p>
+          <div class="term-log" id="termLog" aria-live="polite">
+            <div class="t-dim">// Нажмите GET /fact — терминал выполнит настоящий запрос</div>
+          </div>
+          <div class="term-actions">
+            <button class="nes-btn is-warning" type="button" id="btnFact">GET /fact</button>
+            <button class="nes-btn is-error" type="button" id="btn404">ВЫЗВАТЬ 404</button>
+            <button class="nes-btn" type="button" id="btnClear">ОЧИСТИТЬ</button>
+            <span class="term-meta" id="termMeta">IDLE</span>
+          </div>
+        </div>
+
+        <h2>Что происходит при нажатии</h2>
+        <ol>
+          <li><strong>Строка команды.</strong> В лог печатается адрес, к которому обратился <code>fetch</code>.</li>
+          <li><strong>Статус и время.</strong> Сервер отвечает кодом (200 или 404) — рядом видно, сколько миллисекунд занял путь туда-обратно.</li>
+          <li><strong>Тело ответа.</strong> JSON подсвечивается: ключи жёлтым, строки зелёным, числа голубым — как в DevTools.</li>
+        </ol>
+        <p>Кнопка «ВЫЗВАТЬ 404» обращается к несуществующему пути специально: fetch вернёт ответ, но <code>res.ok</code> будет равен <code>false</code> — ровно тот случай, который мы учились обрабатывать на 5-й стадии.</p>
+
+        <h2>Код, который стоит за терминалом</h2>
+        <pre class="codebox"><code><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://catfact.ninja/fact'</span>);
+<span class="kw">if</span> (!res.ok) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">'HTTP '</span> + res.status);
+<span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();
+<span class="cm">// data = { fact: "…", length: 42 }</span></code></pre>
+        <p>У сервиса есть rate limit (см. 4-ю стадию): если нажимать кнопки слишком часто, однажды придёт <code>429</code> — и это тоже поучительно.</p>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="#/catalog.html">&lt;&lt; STAGE 06</a>
+        <a class="nes-btn is-warning" href="#/glossary.html">STAGE 08 <svg width="12" height="12" style="vertical-align:-1px" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </nav>
+    </section>
+
+    <!-- ===== STAGE 08: ГЛОССАРИЙ ===== -->
+    <section class="page" id="page-glossary" aria-labelledby="t-gloss" hidden>
+      <article class="nes-container doc">
+        <span class="stage-tag">STAGE 08</span>
+        <h1 id="t-gloss">Глоссарий</h1>
+        <p class="lead">Пятнадцать терминов, после которых документация любого API перестаёт звучать как шифровка.</p>
+        <dl class="gloss">
+          <dt>API</dt><dd>Application Programming Interface — контракт, описывающий, какие запросы понимает сервис и что вернёт в ответ.</dd>
+          <dt>Эндпоинт (endpoint)</dt><dd>Конкретный адрес-ресурс внутри API, например <code>/fact</code> или <code>/users/42</code>.</dd>
+          <dt>HTTP</dt><dd>Протокол «запрос — ответ», на котором браузер общается с серверами.</dd>
+          <dt>REST</dt><dd>Стиль построения API: URL — существительные-ресурсы, действия — HTTP-методы, ответы — со стандартными кодами.</dd>
+          <dt>Идемпотентность</dt><dd>Свойство метода давать тот же результат при повторе: сколько ни отправляй DELETE, запись удалена одна.</dd>
+          <dt>JSON</dt><dd>JavaScript Object Notation — текстовый формат данных; стандарт де-факто для современных API.</dd>
+          <dt>XML</dt><dd>Язык разметки с вложенными тегами; живёт в SOAP и банковских интеграциях.</dd>
+          <dt>API-ключ</dt><dd>Строка-идентификатор приложения: по ней сервис считает лимиты и отличает клиентов друг от друга.</dd>
+          <dt>Токен (Bearer)</dt><dd>Временный «пропуск» после входа пользователя; передаётся в заголовке <code>Authorization</code>.</dd>
+          <dt>OAuth 2.0</dt><dd>Протокол делегированного доступа: сайт действует от имени пользователя, не зная его пароля.</dd>
+          <dt>Rate limit</dt><dd>Ограничение частоты запросов (например, 60 в час); при превышении сервер отвечает кодом 429.</dd>
+          <dt>CORS</dt><dd>Механизм браузера, решающий, можно ли странице читать ответы с чужого домена; разрешается заголовком <code>Access-Control-Allow-Origin</code>.</dd>
+          <dt>CRUD</dt><dd>Create, Read, Update, Delete — четыре базовые операции, соответствующие POST, GET, PUT/PATCH, DELETE.</dd>
+          <dt>SDK</dt><dd>Software Development Kit — готовая библиотека-обёртка над API, чтобы не писать запросы вручную.</dd>
+          <dt>Вебхук</dt><dd>«Обратный вызов»: сервис сам присылает POST-запрос на ваш URL, когда случилось событие.</dd>
+        </dl>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="#/demo.html">&lt;&lt; STAGE 07</a>
+        <a class="nes-btn is-warning" href="#/about.html">ФИНАЛ <svg width="12" height="12" style="vertical-align:-1px" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </nav>
+    </section>
+
+    <!-- ===== ФИНАЛ: О ПРОЕКТЕ ===== -->
+    <section class="page" id="page-about" aria-labelledby="t-about" hidden>
+      <article class="nes-container doc">
+        <span class="stage-tag">FINAL STAGE</span>
+        <h1 id="t-about">О проекте</h1>
+        <p class="lead">«API QUEST» — учебный проект по фронтенд-разработке на тему «Использование API-сервисов при разработке сайтов». Сайт не просто рассказывает про API — сам работает как API-клиент: лаборатория на 7-й стадии отправляет настоящие сетевые запросы.</p>
+
+        <h2>Автор</h2>
+        <p>Гарунов Вадим, группа 141-ПМо. Курс: «Фронтенд-разработка». Почта для связи: <a href="mailto:sss2905@pochta.com">sss2905@pochta.com</a>.</p>
+
+        <h2>Стек технологий</h2>
+        <ul class="nes-list is-disc">
+          <li><strong>HTML5</strong> — семантическая разметка: header, nav, main, aside, article, figure, dl, таблицы с caption и scope.</li>
+          <li><strong>CSS3</strong> — кастомные стили поверх фреймворка: Grid, Flexbox, sticky, кастомные свойства, три контрольные точки (мобильные, ≥768px, ≥992px).</li>
+          <li><strong>NES.css 2.6</strong> — CSS-фреймворк в стиле 8-битных консолей.</li>
+          <li><strong>Нативный JavaScript</strong> — хэш-роутер на 11 страниц, бургер-меню, загрузочный экран, фильтры, терминал fetch-запросов, прогресс в localStorage.</li>
+        </ul>
+
+        <h2>Как выполнены требования задания</h2>
+        <div class="table-wrap">
+          <div class="nes-table-responsive">
+            <table class="nes-table is-bordered is-centered">
+              <caption>Таблица 5. Самопроверка по чек-листу</caption>
+              <thead><tr><th scope="col">Требование</th><th scope="col">Где смотреть</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Шапка + навигация + бургер</th><td>На всех страницах; меню ниже 992px сворачивается</td></tr>
+                <tr><th scope="row">Осмысленный сайдбар</th><td>Стадии, монитор прогресса, подсказка, подписка</td></tr>
+                <tr><th scope="row">Таблицы с данными</th><td>5 штук: методы, коды, JSON/XML, каталог, самопроверка</td></tr>
+                <tr><th scope="row">Видео</th><td>Стадия 05, тег &lt;video&gt; с двумя источниками и SVG-постером</td></tr>
+                <tr><th scope="row">Responsive images</th><td>Главная и стадия 01: srcset + sizes + width/height + фолбэк</td></tr>
+                <tr><th scope="row">Формы и интерактив</th><td>Подписка с валидацией, фильтр каталога, терминал, CRT-тумблер</td></tr>
+                <tr><th scope="row">Живой API-запрос</th><td>Стадия 07 — catfact.ninja из браузера</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2>Ссылки</h2>
+        <ul class="nes-list is-disc">
+          <li><a href="https://github.com/username/api-quest" target="_blank" rel="noopener">Исходный код (GitHub)</a></li>
+          <li><a href="https://nostalgic-css.github.io/NES.css/" target="_blank" rel="noopener">Документация NES.css</a></li>
+          <li><a href="https://developer.mozilla.org/ru/docs/Web/API/Fetch_API" target="_blank" rel="noopener">MDN: Fetch API</a></li>
+          <li><a href="https://catfact.ninja" target="_blank" rel="noopener">API, использованный в лаборатории</a></li>
+        </ul>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="#/glossary.html">&lt;&lt; STAGE 08</a>
+        <a class="nes-btn is-warning" href="#/index.html">НА ГЛАВНУЮ <svg width="12" height="12" style="vertical-align:-1px" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </nav>
+    </section>
+
+    <!-- ===== 404 ===== -->
+    <section class="page" id="page-404" aria-label="Страница не найдена" hidden>
+      <div class="nes-container hero">
+        <div>
+          <h1>GAME OVER</h1>
+          <p class="tagline">Ошибка 404: такой страницы нет. Проверьте адрес или начните квест заново — прогресс сохранён.</p>
+          <div class="hero-actions">
+            <a class="nes-btn is-warning" href="#/index.html">RESTART</a>
+            <a class="nes-btn" href="#/catalog.html">В КАТАЛОГ API</a>
+          </div>
+        </div>
+        <svg class="tv" viewBox="0 0 200 150" role="img" aria-label="Ретро-телевизор с надписью 404 на экране">
+          <path d="M56 6 L88 40" stroke="#3a3a46" stroke-width="5"/>
+          <path d="M144 6 L112 40" stroke="#3a3a46" stroke-width="5"/>
+          <circle cx="52" cy="8" r="4" fill="#3a3a46"/><circle cx="148" cy="8" r="4" fill="#3a3a46"/>
+          <rect x="16" y="42" width="168" height="92" fill="#2f2f3a" stroke="#000" stroke-width="4"/>
+          <rect x="26" y="52" width="112" height="70" fill="#26100e" stroke="#000" stroke-width="3"/>
+          <text x="36" y="96" font-family="'Press Start 2P',monospace" font-size="17" fill="#e76e55">404</text>
+          <rect class="blink" x="86" y="82" width="11" height="15" fill="#e76e55"/>
+          <rect x="148" y="56" width="26" height="5" fill="#575764"/>
+          <rect x="148" y="66" width="26" height="5" fill="#575764"/>
+          <rect x="148" y="76" width="26" height="5" fill="#575764"/>
+          <rect x="150" y="94" width="22" height="14" fill="#e76e55" stroke="#000" stroke-width="3"/>
+          <rect x="150" y="114" width="22" height="8" fill="#f7d51d" stroke="#000" stroke-width="3"/>
+          <rect x="32" y="136" width="18" height="10" fill="#2f2f3a" stroke="#000" stroke-width="3"/>
+          <rect x="150" y="136" width="18" height="10" fill="#2f2f3a" stroke="#000" stroke-width="3"/>
+        </svg>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= САЙДБАР ================= -->
+  <aside class="sidebar" aria-label="Боковая панель">
+    <nav class="nes-container stage-dark" style="padding:16px" aria-label="Стадии квеста">
+      <h2 style="font-size:11px;color:var(--yellow);margin:0 0 12px">STAGES</h2>
+      <ul class="side-stages">
+        <li><a href="#/api-basics.html" data-side="api-basics.html"><span class="n">01</span>Что такое API<svg class="star" aria-hidden="true"><use href="#i-spark"/></svg></a></li>
+        <li><a href="#/rest-http.html" data-side="rest-http.html"><span class="n">02</span>REST и HTTP<svg class="star" aria-hidden="true"><use href="#i-spark"/></svg></a></li>
+        <li><a href="#/data-formats.html" data-side="data-formats.html"><span class="n">03</span>JSON и XML<svg class="star" aria-hidden="true"><use href="#i-spark"/></svg></a></li>
+        <li><a href="#/auth-keys.html" data-side="auth-keys.html"><span class="n">04</span>Ключи и токены<svg class="star" aria-hidden="true"><use href="#i-spark"/></svg></a></li>
+        <li><a href="#/frontend.html" data-side="frontend.html"><span class="n">05</span>Интеграция<svg class="star" aria-hidden="true"><use href="#i-spark"/></svg></a></li>
+        <li><a href="#/catalog.html" data-side="catalog.html"><span class="n">06</span>Каталог API<svg class="star" aria-hidden="true"><use href="#i-spark"/></svg></a></li>
+        <li><a href="#/demo.html" data-side="demo.html"><span class="n">07</span>Лаборатория<svg class="star" aria-hidden="true"><use href="#i-spark"/></svg></a></li>
+        <li><a href="#/glossary.html" data-side="glossary.html"><span class="n">08</span>Глоссарий<svg class="star" aria-hidden="true"><use href="#i-spark"/></svg></a></li>
+        <li><a href="#/about.html" data-side="about.html"><span class="n">09</span>О проекте<svg class="star" aria-hidden="true"><use href="#i-spark"/></svg></a></li>
+      </ul>
+    </nav>
+
+    <section class="nes-container stage-dark monitor" style="padding:16px" aria-label="Монитор прогресса">
+      <h2 style="font-size:11px;color:var(--yellow);margin:0 0 12px">MONITOR</h2>
+      <div class="m-row">
+        <div class="m-head"><span>STAGES CLEAR</span><span id="monCount">0/9</span></div>
+        <progress class="nes-progress is-success" id="monBar" value="0" max="9"></progress>
+      </div>
+      <div class="m-row">
+        <div class="m-head"><span>LAST STAGE</span><span id="monLast">—</span></div>
+      </div>
+    </section>
+
+    <section class="nes-container side-tip" aria-label="Подсказка стадии">
+      <h2 style="font-size:11px;margin:0 0 8px">TIP</h2>
+      <p class="tip-body" id="sideTip">Пройдите стадии по порядку — прогресс сохраняется в браузере.</p>
+    </section>
+
+    <section class="nes-container side-tip" aria-label="Подписка на рассылку">
+      <form class="sub-form" id="subForm" novalidate>
+        <h2 style="font-size:11px;margin:0 0 8px">NEWSLETTER</h2>
+        <label for="subEmail">Раз в неделю — разбор одного настоящего API</label>
+        <input class="nes-input" id="subEmail" type="email" placeholder="player@example.com" autocomplete="email">
+        <label style="display:flex;gap:8px;align-items:flex-start;font-weight:400;font-size:14px;margin-top:10px">
+          <input type="checkbox" class="nes-checkbox" id="subAgree" style="flex:none">
+          <span>Согласен получать письма (демо-режим, адрес хранится только в вашем браузере)</span>
+        </label>
+        <p class="field-msg" id="subMsg" hidden></p>
+        <button class="nes-btn is-primary" type="submit" style="width:100%;margin-top:6px">ПОДПИСАТЬСЯ</button>
+      </form>
+    </section>
+  </aside>
+</div>
+
+<!-- ================= ПОДВАЛ ================= -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <h3>API QUEST</h3>
+      <p>Учебный проект Гарунова Вадима (группа 141-ПМо) по фронтенд-разработке на тему «Использование API-сервисов при разработке сайтов». Собран на HTML5, CSS3, NES.css и нативном JavaScript. Все запросы в лаборатории — настоящие.</p>
+      <p class="footer-heart">Сделано с <svg aria-hidden="true"><use href="#i-heart"/></svg> и NES.css</p>
+    </div>
+    <nav aria-label="Разделы">
+      <h3>РАЗДЕЛЫ</h3>
+      <ul>
+        <li><a href="#/api-basics.html">Учебник</a></li>
+        <li><a href="#/catalog.html">Каталог API</a></li>
+        <li><a href="#/demo.html">Живая лаборатория</a></li>
+        <li><a href="#/glossary.html">Глоссарий</a></li>
+        <li><a href="#/about.html">О проекте</a></li>
+      </ul>
+    </nav>
+    <div>
+      <h3>КОНТАКТЫ</h3>
+      <ul>
+        <li><a href="mailto:sss2905@pochta.com">sss2905@pochta.com</a></li>
+        <li><a href="https://github.com/username/api-quest" target="_blank" rel="noopener">GitHub-репозиторий</a></li>
+        <li><a href="https://nostalgic-css.github.io/NES.css/" target="_blank" rel="noopener">Документация NES.css</a></li>
+      </ul>
+    </div>
+  </div>
+  <p class="insert">&copy; <span id="year">2025</span> Гарунов Вадим · 141-ПМо · INSERT COIN TO CONTINUE</p>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+/* ---------- хранилище ---------- */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ---------- boot-экран ---------- */
+(function boot(){
+  const box = $('#boot'), bar = $('#bootBar'), pct = $('#bootPct');
+  let finished = false;
+  const end = () => { if (finished) return; finished = true; box.classList.add('done'); };
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches){ end(); return; }
+  let p = 0;
+  const iv = setInterval(() => {
+    p = Math.min(100, p + 7 + Math.random() * 14);
+    bar.value = p;
+    pct.textContent = Math.round(p) + '% — кликните, чтобы пропустить';
+    if (p >= 100) end();
+  }, 90);
+  box.addEventListener('click', end, { once: true });
+  setTimeout(end, 4500);
+})();
+
+/* ---------- CRT-тумблер ---------- */
+const crtBtn = $('#crtToggle');
+function applyCrt(on){
+  document.body.classList.toggle('crt-off', !on);
+  crtBtn.setAttribute('aria-pressed', String(on));
+  store.set('apiquest-crt', on);
+}
+crtBtn.addEventListener('click', () => applyCrt(document.body.classList.contains('crt-off')));
+applyCrt(store.get('apiquest-crt', true));
+
+/* ---------- бургер-меню ---------- */
+const header = $('#siteHeader'), navToggle = $('#navToggle');
+navToggle.addEventListener('click', () => {
+  const open = header.classList.toggle('menu-open');
+  navToggle.setAttribute('aria-expanded', String(open));
+  navToggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
+});
+
+/* ---------- роутер ---------- */
+const ROUTES = {
+  'index.html':        { el: 'page-home',         nav: 'home',    stage: null,                title: 'API QUEST — учебный сайт об API-сервисах' },
+  'api-basics.html':   { el: 'page-api-basics',   nav: 'docs',    stage: 'api-basics.html',   title: 'Stage 01 · Что такое API — API QUEST' },
+  'rest-http.html':    { el: 'page-rest-http',    nav: 'docs',    stage: 'rest-http.html',    title: 'Stage 02 · REST и HTTP — API QUEST' },
+  'data-formats.html': { el: 'page-data-formats', nav: 'docs',    stage: 'data-formats.html', title: 'Stage 03 · JSON и XML — API QUEST' },
+  'auth-keys.html':    { el: 'page-auth-keys',    nav: 'docs',    stage: 'auth-keys.html',    title: 'Stage 04 · Ключи и токены — API QUEST' },
+  'frontend.html':     { el: 'page-frontend',     nav: 'docs',    stage: 'frontend.html',     title: 'Stage 05 · Интеграция на фронтенде — API QUEST' },
+  'catalog.html':      { el: 'page-catalog',      nav: 'catalog', stage: 'catalog.html',      title: 'Stage 06 · Каталог публичных API — API QUEST' },
+  'demo.html':         { el: 'page-demo',         nav: 'demo',    stage: 'demo.html',         title: 'Stage 07 · Живая лаборатория — API QUEST' },
+  'glossary.html':     { el: 'page-glossary',     nav: 'glossary',stage: 'glossary.html',     title: 'Stage 08 · Глоссарий — API QUEST' },
+  'about.html':        { el: 'page-about',        nav: 'about',   stage: 'about.html',        title: 'Финал · О проекте — API QUEST' },
+  '404.html':          { el: 'page-404',          nav: null,      stage: null,                title: '404 · Страница не найдена — API QUEST' }
+};
+const ALL_STAGES = ['api-basics.html','rest-http.html','data-formats.html','auth-keys.html','frontend.html','catalog.html','demo.html','glossary.html','about.html'];
+const TIPS = {
+  'index.html':        'Начните со Stage 01 — или сразу откройте живую лабораторию (Stage 07).',
+  'api-basics.html':   'API — это договор. Дальше узнаем, на каком языке он написан.',
+  'rest-http.html':    'GET читает, POST создаёт. А 404 — не «сломалось», а «не найдено».',
+  'data-formats.html': 'Ключи JSON — всегда в двойных кавычках, без запятой после последнего элемента.',
+  'auth-keys.html':    'Секретный ключ никогда не живёт во фронтенде. Только на сервере.',
+  'frontend.html':     'fetch не считает 404 ошибкой — проверяйте res.ok сами.',
+  'catalog.html':      'Колонка CORS подсказывает, можно ли звать API прямо из браузера.',
+  'demo.html':         'Нажмите «ВЫЗВАТЬ 404» — увидите, как выглядит обработка ошибки.',
+  'glossary.html':     'Вернитесь сюда после квеста: термины закрепятся сами собой.',
+  'about.html':        'Перед сдачей сверитесь с чек-листом требований.',
+  '404.html':          'Такой страницы нет — но квест никуда не убежал.',
+  default:             'Пройдите стадии по порядку — прогресс сохраняется в браузере.'
+};
+
+const done = new Set(store.get('apiquest-done', []));
+
+function scrollTop(){
+  const html = document.documentElement;
+  const prev = html.style.scrollBehavior;
+  html.style.scrollBehavior = 'auto';
+  window.scrollTo(0, 0);
+  html.style.scrollBehavior = prev;
+}
+
+function markDone(stage){
+  if (!stage || done.has(stage)) return;
+  done.add(stage);
+  store.set('apiquest-done', Array.from(done));
+  toast('★ STAGE CLEARED!');
+}
+
+function updateProgressUI(){
+  $$('.stage-track li').forEach(li => {
+    const s = (li.dataset.stage || '').replace(/^\//, '');
+    const cleared = done.has(s);
+    li.classList.toggle('cleared', cleared);
+    const note = li.querySelector('.cleared-note');
+    if (note) note.hidden = !cleared;
+  });
+  $$('.side-stages a').forEach(a => a.classList.toggle('done', done.has(a.dataset.side)));
+  const total = ALL_STAGES.length;
+  $('#monCount').textContent = done.size + '/' + total;
+  const bar = $('#monBar'); bar.max = total; bar.value = done.size;
+  const last = store.get('apiquest-last', null);
+  const idx = last ? ALL_STAGES.indexOf(last) : -1;
+  $('#monLast').textContent = idx >= 0 ? 'STAGE ' + String(idx + 1).padStart(2, '0') : '—';
+}
+
+function navigate(){
+  let h = location.hash.replace(/^#\/?/, '');
+  if (!h) h = 'index.html';
+  const route = ROUTES[h] ? h : '404.html';
+  const cfg = ROUTES[route];
+  $$('.page').forEach(p => { p.hidden = (p.id !== cfg.el); });
+  document.title = cfg.title;
+  $$('#siteNav a').forEach(a => {
+    const active = cfg.nav && a.dataset.nav === cfg.nav;
+    a.classList.toggle('is-active', active);
+    if (active) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+  header.classList.remove('menu-open');
+  navToggle.setAttribute('aria-expanded', 'false');
+  scrollTop();
+  if (cfg.stage){ store.set('apiquest-last', cfg.stage); markDone(cfg.stage); }
+  $('#sideTip').textContent = TIPS[route] || TIPS.default;
+  updateProgressUI();
+}
+window.addEventListener('hashchange', navigate);
+
+/* ---------- плавный скролл по кнопкам с data-scroll ---------- */
+ $$('[data-scroll]').forEach(btn => btn.addEventListener('click', () => {
+  const t = document.querySelector(btn.dataset.scroll);
+  if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}));
+
+/* ---------- каталог: фильтр ---------- */
+const fBtns = $$('.filter-btn');
+const apiRows = $$('#apiTable tbody tr');
+const fCount = $('#filterCount');
+function applyFilter(cat){
+  fBtns.forEach(b => b.classList.toggle('is-warning', b.dataset.cat === cat));
+  let n = 0;
+  apiRows.forEach(tr => {
+    const show = (cat === 'all') || (tr.dataset.cat === cat);
+    tr.hidden = !show;
+    if (show) n++;
+  });
+  fCount.textContent = n;
+}
+fBtns.forEach(b => b.addEventListener('click', () => applyFilter(b.dataset.cat)));
+
+/* ---------- терминал: живой запрос к API ---------- */
+const termLog = $('#termLog'), termMeta = $('#termMeta');
+const busyBtns = ['#btnFact', '#btn404'];
+let busy = false;
+
+const escHtml = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function logLine(cls, html){
+  const d = document.createElement('div');
+  d.className = cls;
+  d.innerHTML = html;
+  termLog.appendChild(d);
+  termLog.scrollTop = termLog.scrollHeight;
+}
+
+function hlJSON(value){
+  let json;
+  try { json = JSON.stringify(value, null, 2); } catch(e){ json = String(value); }
+  return escHtml(json).replace(
+    /("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g,
+    (m, str, colon, kw) => {
+      if (str) return colon ? '<span class="t-key">' + str + '</span>' + colon
+                            : '<span class="t-str">' + str + '</span>';
+      if (kw)  return '<span class="t-bool">' + kw + '</span>';
+      return '<span class="t-num">' + m + '</span>';
+    }
+  );
+}
+
+async function callApi(url){
+  if (busy) return;
+  busy = true;
+  busyBtns.forEach(s => { $(s).disabled = true; });
+  logLine('t-cmd', '$ fetch(' + escHtml(url) + ')');
+  termMeta.textContent = 'LOADING…';
+  const t0 = performance.now();
+  try {
+    const res = await fetch(url);
+    const ms = Math.round(performance.now() - t0);
+    logLine(res.ok ? 't-ok' : 't-err',
+      '← HTTP ' + res.status + (res.statusText ? ' ' + escHtml(res.statusText) : '') + ' · ' + ms + ' ms');
+    const text = await res.text();
+    let body = null;
+    try { body = JSON.parse(text); } catch(e){}
+    if (body !== null && typeof body === 'object'){
+      logLine('t-json', hlJSON(body));
+    } else {
+      logLine('t-dim', '// тело не JSON: ' + escHtml(text.slice(0, 160)) + '…');
+    }
+    termMeta.textContent = 'HTTP ' + res.status + ' · ' + ms + ' MS';
+  } catch(err){
+    logLine('t-err', '✖ NETWORK ERROR: ' + escHtml(err.message));
+    termMeta.textContent = 'NETWORK ERROR';
+  }
+  busy = false;
+  busyBtns.forEach(s => { $(s).disabled = false; });
+}
+
+ $('#btnFact').addEventListener('click', () => callApi('https://catfact.ninja/fact'));
+ $('#btn404').addEventListener('click', () => callApi('https://catfact.ninja/fact404'));
+ $('#btnClear').addEventListener('click', () => {
+  termLog.innerHTML = '';
+  logLine('t-dim', '// лог очищен. Готов к новому запросу.');
+  termMeta.textContent = 'IDLE';
+});
+
+/* ---------- подписка ---------- */
+ $('#subForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const email = $('#subEmail').value.trim();
+  const agree = $('#subAgree').checked;
+  const msg = $('#subMsg');
+  const ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  $('#subEmail').classList.toggle('is-invalid', !ok);
+  if (!ok){ msg.hidden = false; msg.style.color = ''; msg.textContent = 'Проверьте email — кажется, есть опечатка.'; return; }
+  if (!agree){ msg.hidden = false; msg.style.color = ''; msg.textContent = 'Отметьте согласие — без него подписку не оформить.'; return; }
+  store.set('apiquest-sub', email);
+  msg.hidden = false;
+  msg.style.color = 'var(--green)';
+  msg.textContent = 'Готово! Письма полетят на ' + email + '.';
+  toast('SUBSCRIBED!');
+  e.target.reset();
+});
+
+/* ---------- фолбэк иллюстраций: если внешний хост недоступен —
+   подставляем встроенную пиксельную SVG-картинку ---------- */
+const IMG_FALLBACK = {
+  'apiquest-network': "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 40' shape-rendering='crispEdges'%3E%3Crect width='80' height='40' fill='%2317171f'/%3E%3Cpath d='M40 12 V18 M16 18 H64 M20 18 V26 M40 18 V26 M60 18 V26' stroke='%233a3a46' stroke-width='2'/%3E%3Crect x='36' y='4' width='8' height='8' fill='%23f7d51d'/%3E%3Crect x='38' y='6' width='2' height='2' fill='%2317171f'/%3E%3Crect x='42' y='6' width='2' height='2' fill='%2317171f'/%3E%3Crect x='16' y='26' width='8' height='8' fill='%2392cc41'/%3E%3Crect x='36' y='26' width='8' height='8' fill='%23209cee'/%3E%3Crect x='56' y='26' width='8' height='8' fill='%23e76e55'/%3E%3Crect x='38' y='19' width='4' height='2' fill='%23f7d51d'/%3E%3Crect x='18' y='21' width='4' height='2' fill='%2392cc41'/%3E%3Crect x='58' y='21' width='4' height='2' fill='%23e76e55'/%3E%3C/svg%3E",
+  'api-port': "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 40' shape-rendering='crispEdges'%3E%3Crect width='80' height='40' fill='%2317171f'/%3E%3Cpath d='M24 20 H34 V28 H46 V20 H56' stroke='%23f7d51d' stroke-width='3' fill='none'/%3E%3Crect x='8' y='10' width='16' height='14' fill='%23209cee'/%3E%3Crect x='11' y='13' width='10' height='6' fill='%230c2416'/%3E%3Crect x='12' y='30' width='8' height='3' fill='%233a3a46'/%3E%3Crect x='56' y='10' width='16' height='14' fill='%2392cc41'/%3E%3Crect x='59' y='13' width='10' height='6' fill='%230c2416'/%3E%3Crect x='60' y='30' width='8' height='3' fill='%233a3a46'/%3E%3C/svg%3E"
+};
+ $$('img.pixel-img[data-fb]').forEach(img => {
+  let swapped = false;
+  const swap = () => {
+    if (swapped || !IMG_FALLBACK[img.dataset.fb]) return;
+    swapped = true;
+    img.srcset = '';
+    img.removeAttribute('sizes');
+    img.src = IMG_FALLBACK[img.dataset.fb];
+  };
+  img.addEventListener('error', swap);
+  /* если хост молчит (не ошибка, а зависший запрос) — подменяем через 7 секунд */
+  window.setTimeout(() => {
+    if (!(img.complete && img.naturalWidth > 0)) swap();
+  }, 7000);
+});
+
+/* ---------- фолбэк видео: если оба источника недоступны —
+   показываем подсказку вместо молчащего чёрного плеера ---------- */
+(function(){
+  const v = $('#apiVideo');
+  if (!v) return;
+  const note = $('#videoNote');
+  let failed = false;
+  const showFail = () => {
+    if (failed) return;
+    failed = true;
+    if (note) note.hidden = false;
+  };
+  /* true на третьем аргументе — ловим событие error от дочерних <source> */
+  v.addEventListener('error', () => {
+    if (v.error || v.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) showFail();
+  }, true);
+  /* страховка: если через 12 секунд видео так и не начало грузиться */
+  window.setTimeout(() => {
+    if (v.readyState === 0 && (v.networkState === HTMLMediaElement.NETWORK_NO_SOURCE || v.error)) showFail();
+  }, 12000);
+})();
+
+/* ---------- год в подвале ---------- */
+ $('#year').textContent = new Date().getFullYear();
+
+/* ---------- старт ---------- */
+applyFilter('all');
+navigate();
+</script>
+</body>
+</html>
