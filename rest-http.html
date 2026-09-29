@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 02 · REST и HTTP — API QUEST</title>
+<meta name="description" content="Stage 02: анатомия URL, HTTP-методы, коды ответов и принципы REST.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f7d51d'/%3E%3Crect x='1' y='1' width='14' height='14' fill='none' stroke='%23212529' stroke-width='2'/%3E%3Ctext x='8' y='12' font-family='monospace' font-size='10' font-weight='bold' text-anchor='middle' fill='%23212529'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/nes.css@2.6.0/css/nes.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body data-page="rest-http">
+<div class="scanlines" aria-hidden="true"></div>
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="brand" href="index.html" aria-label="API QUEST — на главную"><span class="brand-name">API<em>QUEST</em></span></a>
+    <span class="header-spacer"></span>
+    <nav aria-label="Основная навигация">
+      <ul class="nav-list" id="siteNav">
+        <li><a href="index.html" data-nav="home">ГЛАВНАЯ</a></li>
+        <li><a href="api-basics.html" data-nav="docs">УЧЕБНИК</a></li>
+        <li><a href="catalog.html" data-nav="catalog">КАТАЛОГ</a></li>
+        <li><a href="demo.html" data-nav="demo">ДЕМО</a></li>
+        <li><a href="glossary.html" data-nav="glossary">ГЛОССАРИЙ</a></li>
+        <li><a href="about.html" data-nav="about">О ПРОЕКТЕ</a></li>
+      </ul>
+    </nav>
+    <button type="button" class="crt-toggle" id="crtToggle" aria-pressed="true" title="Переключить CRT-эффект">CRT</button>
+    <button type="button" class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="siteNav" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="layout">
+  <main id="main">
+    <section class="page" aria-labelledby="h1-02">
+      <article class="nes-container doc">
+        <span class="stage-tag">STAGE 02</span>
+        <h1 id="h1-02">REST и HTTP</h1>
+        <p class="lead">HTTP — протокол, на котором браузер общается с серверами. REST — набор правил, как строить API поверх HTTP так, чтобы это было предсказуемо и удобно.</p>
+        <h2>Анатомия URL</h2>
+        <p>Каждый запрос адресуется URL. Разберём типичный адрес API по частям:</p>
+        <p class="url-demo"><span class="u-proto">https://</span><span class="u-host">api.example.com</span><span class="u-path">/v1/facts</span><span class="u-query">?limit=3</span></p>
+        <dl class="url-legend">
+          <dt style="color:#8a6d00">https://</dt><dd>Протокол и гарантия шифрования. Публичные API работают только по HTTPS.</dd>
+          <dt style="color:#0a5fae">api.example.com</dt><dd>Домен сервера, который принимает запросы.</dd>
+          <dt style="color:#3f8f3f">/v1/facts</dt><dd>Путь к ресурсу (endpoint). Версия <code>v1</code> позволяет менять API, не ломая старых клиентов.</dd>
+          <dt style="color:#b3403a">?limit=3</dt><dd>Query-параметры — настройки запроса: сколько отдать, как отфильтровать.</dd>
+        </dl>
+        <h2>HTTP-методы</h2>
+        <p>Метод сообщает серверу, <em>что именно</em> вы хотите сделать с ресурсом. Запомните пять основных:</p>
+        <div class="table-wrap">
+          <div class="nes-table-responsive">
+            <table class="nes-table is-bordered is-centered">
+              <caption>Таблица 1. Основные HTTP-методы</caption>
+              <thead><tr><th scope="col">Метод</th><th scope="col">Назначение</th><th scope="col">Идемпотентен</th><th scope="col">Пример</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">GET</th><td>Получить данные, ничего не меняя</td><td>Да</td><td>GET /api/facts</td></tr>
+                <tr><th scope="row">POST</th><td>Создать новый ресурс</td><td>Нет</td><td>POST /api/comments</td></tr>
+                <tr><th scope="row">PUT</th><td>Полностью заменить ресурс</td><td>Да</td><td>PUT /api/users/42</td></tr>
+                <tr><th scope="row">PATCH</th><td>Частично изменить ресурс</td><td>Нет</td><td>PATCH /api/users/42</td></tr>
+                <tr><th scope="row">DELETE</th><td>Удалить ресурс</td><td>Да</td><td>DELETE /api/comments/7</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p><strong>Идемпотентность</strong> означает, что повторный запрос не меняет результат: сто раз отправленный DELETE удалит ресурс так же, как один. А вот сто POST-запросов создадут сто комментариев.</p>
+        <h2>Коды ответов</h2>
+        <p>Каждый ответ сервера несёт трёхзначный код статуса — по нему фронтенд понимает, что произошло. Первая цифра задаёт класс ответа.</p>
+        <div class="table-wrap">
+          <div class="nes-table-responsive">
+            <table class="nes-table is-bordered is-centered">
+              <caption>Таблица 2. Коды статусов, которые встречаются чаще всего</caption>
+              <thead><tr><th scope="col">Код</th><th scope="col">Значение</th><th scope="col">Что делать фронтенду</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">200</th><td>OK — успех</td><td>Обработать данные из тела ответа</td></tr>
+                <tr><th scope="row">201</th><td>Created — ресурс создан</td><td>Обновить интерфейс, показать новый элемент</td></tr>
+                <tr><th scope="row">204</th><td>No Content — успех без тела</td><td>Ничего не парсить</td></tr>
+                <tr><th scope="row">301</th><td>Перемещён навсегда</td><td>Браузер перейдёт сам по новому адресу</td></tr>
+                <tr><th scope="row">400</th><td>Bad Request — ошибка в запросе</td><td>Проверить параметры и валидацию формы</td></tr>
+                <tr><th scope="row">401</th><td>Не авторизован</td><td>Отправить пользователя на вход</td></tr>
+                <tr><th scope="row">403</th><td>Доступ запрещён</td><td>Показать сообщение о правах</td></tr>
+                <tr><th scope="row">404</th><td>Не найдено</td><td>Показать заглушку (как наша страница 404!)</td></tr>
+                <tr><th scope="row">429</th><td>Слишком много запросов</td><td>Подождать и повторить позже</td></tr>
+                <tr><th scope="row">500</th><td>Ошибка на сервере</td><td>Сообщить пользователю и залогировать</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <h2>Принципы REST</h2>
+        <ol>
+          <li><strong>Клиент — сервер.</strong> Логика разделена: фронтенд не знает о хранении данных, сервер — об отрисовке.</li>
+          <li><strong>Отсутствие состояния (stateless).</strong> Каждый запрос самодостаточен: сервер не помнит предыдущие.</li>
+          <li><strong>Ресурсы и адреса.</strong> URL — это существительные (<code>/users/42</code>), действия выражаются методами.</li>
+          <li><strong>Единообразие интерфейса.</strong> Одинаковые структуры ответов, стандартные коды статусов, предсказуемые названия.</li>
+          <li><strong>Кэшируемость.</strong> Ответы помечаются как кэшируемые, чтобы не гонять одни и те же данные.</li>
+        </ol>
+        <p>Проверить себя можно на 7-й стадии: терминал покажет и метод, и статус, и тело реального ответа.</p>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="api-basics.html">&lt;&lt; STAGE 01</a>
+        <a class="nes-btn is-warning" href="data-formats.html">STAGE 03 →</a>
+      </nav>
+    </section>
+  </main>
+  <aside class="sidebar" aria-label="Боковая панель">
+    <nav class="nes-container stage-dark sb-pad" aria-label="Стадии квеста">
+      <h2 class="sb-h">STAGES</h2>
+      <ul class="side-stages">
+        <li><a href="api-basics.html" data-side="api-basics"><span class="n">01</span>Что такое API</a></li>
+        <li><a href="rest-http.html" data-side="rest-http"><span class="n">02</span>REST и HTTP</a></li>
+        <li><a href="data-formats.html" data-side="data-formats"><span class="n">03</span>JSON и XML</a></li>
+        <li><a href="auth-keys.html" data-side="auth-keys"><span class="n">04</span>Ключи и токены</a></li>
+        <li><a href="frontend.html" data-side="frontend"><span class="n">05</span>Интеграция</a></li>
+        <li><a href="catalog.html" data-side="catalog"><span class="n">06</span>Каталог API</a></li>
+        <li><a href="demo.html" data-side="demo"><span class="n">07</span>Лаборатория</a></li>
+        <li><a href="glossary.html" data-side="glossary"><span class="n">08</span>Глоссарий</a></li>
+        <li><a href="about.html" data-side="about"><span class="n">09</span>О проекте</a></li>
+      </ul>
+    </nav>
+    <section class="nes-container stage-dark monitor sb-pad" aria-label="Монитор прогресса">
+      <h2 class="sb-h">MONITOR</h2>
+      <div class="m-row"><div class="m-head"><span>STAGES CLEAR</span><span id="monCount">0/9</span></div><progress class="nes-progress is-success" id="monBar" value="0" max="9"></progress></div>
+      <div class="m-row"><div class="m-head"><span>LAST STAGE</span><span id="monLast">—</span></div></div>
+    </section>
+    <section class="nes-container side-tip" aria-label="Подсказка стадии">
+      <h2 class="sb-h">TIP</h2>
+      <p class="tip-body" id="sideTip">Пройдите стадии по порядку — прогресс сохраняется в браузере.</p>
+    </section>
+    <section class="nes-container side-tip" aria-label="Подписка на рассылку">
+      <form class="sub-form" id="subForm" novalidate>
+        <h2 class="sb-h">NEWSLETTER</h2>
+        <label for="subEmail">Раз в неделю — разбор одного настоящего API</label>
+        <input class="nes-input" id="subEmail" type="email" placeholder="player@example.com" autocomplete="email">
+        <label class="agree-row"><input type="checkbox" class="nes-checkbox" id="subAgree"><span>Согласен получать письма (демо-режим, адрес хранится только в вашем браузере)</span></label>
+        <p class="field-msg" id="subMsg" hidden></p>
+        <button class="nes-btn is-primary full-btn" type="submit">ПОДПИСАТЬСЯ</button>
+      </form>
+    </section>
+  </aside>
+</div>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <h3>API QUEST</h3>
+      <p>Учебный проект Гарунова Вадима (группа 141-ПМо) по фронтенд-разработке на тему «Использование API-сервисов при разработке сайтов». Собран на HTML5, CSS3, NES.css и нативном JavaScript. Все запросы в лаборатории — настоящие.</p>
+      <p>Сделано с <span class="heart-red" aria-hidden="true">♥</span> и NES.css</p>
+    </div>
+    <nav aria-label="Разделы">
+      <h3>РАЗДЕЛЫ</h3>
+      <ul>
+        <li><a href="api-basics.html">Учебник</a></li>
+        <li><a href="catalog.html">Каталог API</a></li>
+        <li><a href="demo.html">Живая лаборатория</a></li>
+        <li><a href="glossary.html">Глоссарий</a></li>
+        <li><a href="about.html">О проекте</a></li>
+      </ul>
+    </nav>
+    <div>
+      <h3>КОНТАКТЫ</h3>
+      <ul>
+        <li><a href="mailto:sss2905@pochta.com">sss2905@pochta.com</a></li>
+        <li><a href="https://github.com/vadimbd222/api-quest" target="_blank" rel="noopener">GitHub-репозиторий</a></li>
+        <li><a href="https://nostalgic-css.github.io/NES.css/" target="_blank" rel="noopener">Документация NES.css</a></li>
+      </ul>
+    </div>
+  </div>
+  <p class="insert">&copy; <span id="year">2025</span> Гарунов Вадим · 141-ПМо · INSERT COIN TO CONTINUE</p>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+<script src="js/script.js"></script>
+</body>
+</html>

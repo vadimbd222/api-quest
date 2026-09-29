@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 08 · Глоссарий — API QUEST</title>
+<meta name="description" content="Stage 08: глоссарий из 15 терминов об API — от эндпоинта до вебхука.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f7d51d'/%3E%3Crect x='1' y='1' width='14' height='14' fill='none' stroke='%23212529' stroke-width='2'/%3E%3Ctext x='8' y='12' font-family='monospace' font-size='10' font-weight='bold' text-anchor='middle' fill='%23212529'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/nes.css@2.6.0/css/nes.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body data-page="glossary">
+<div class="scanlines" aria-hidden="true"></div>
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="brand" href="index.html" aria-label="API QUEST — на главную"><span class="brand-name">API<em>QUEST</em></span></a>
+    <span class="header-spacer"></span>
+    <nav aria-label="Основная навигация">
+      <ul class="nav-list" id="siteNav">
+        <li><a href="index.html" data-nav="home">ГЛАВНАЯ</a></li>
+        <li><a href="api-basics.html" data-nav="docs">УЧЕБНИК</a></li>
+        <li><a href="catalog.html" data-nav="catalog">КАТАЛОГ</a></li>
+        <li><a href="demo.html" data-nav="demo">ДЕМО</a></li>
+        <li><a href="glossary.html" data-nav="glossary">ГЛОССАРИЙ</a></li>
+        <li><a href="about.html" data-nav="about">О ПРОЕКТЕ</a></li>
+      </ul>
+    </nav>
+    <button type="button" class="crt-toggle" id="crtToggle" aria-pressed="true" title="Переключить CRT-эффект">CRT</button>
+    <button type="button" class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="siteNav" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="layout">
+  <main id="main">
+    <section class="page" aria-labelledby="h1-08">
+      <article class="nes-container doc">
+        <span class="stage-tag">STAGE 08</span>
+        <h1 id="h1-08">Глоссарий</h1>
+        <p class="lead">Пятнадцать терминов, после которых документация любого API перестаёт звучать как шифровка.</p>
+        <dl class="gloss">
+          <dt>API</dt><dd>Application Programming Interface — контракт, описывающий, какие запросы понимает сервис и что вернёт в ответ.</dd>
+          <dt>Эндпоинт (endpoint)</dt><dd>Конкретный адрес-ресурс внутри API, например <code>/fact</code> или <code>/users/42</code>.</dd>
+          <dt>HTTP</dt><dd>Протокол «запрос — ответ», на котором браузер общается с серверами.</dd>
+          <dt>REST</dt><dd>Стиль построения API: URL — существительные-ресурсы, действия — HTTP-методы, ответы — со стандартными кодами.</dd>
+          <dt>Идемпотентность</dt><dd>Свойство метода давать тот же результат при повторе: сколько ни отправляй DELETE, запись удалена одна.</dd>
+          <dt>JSON</dt><dd>JavaScript Object Notation — текстовый формат данных; стандарт де-факто для современных API.</dd>
+          <dt>XML</dt><dd>Язык разметки с вложенными тегами; живёт в SOAP и банковских интеграциях.</dd>
+          <dt>API-ключ</dt><dd>Строка-идентификатор приложения: по ней сервис считает лимиты и отличает клиентов друг от друга.</dd>
+          <dt>Токен (Bearer)</dt><dd>Временный «пропуск» после входа пользователя; передаётся в заголовке <code>Authorization</code>.</dd>
+          <dt>OAuth 2.0</dt><dd>Протокол делегированного доступа: сайт действует от имени пользователя, не зная его пароля.</dd>
+          <dt>Rate limit</dt><dd>Ограничение частоты запросов (например, 60 в час); при превышении сервер отвечает кодом 429.</dd>
+          <dt>CORS</dt><dd>Механизм браузера, решающий, можно ли странице читать ответы с чужого домена; разрешается заголовком <code>Access-Control-Allow-Origin</code>.</dd>
+          <dt>CRUD</dt><dd>Create, Read, Update, Delete — четыре базовые операции, соответствующие POST, GET, PUT/PATCH, DELETE.</dd>
+          <dt>SDK</dt><dd>Software Development Kit — готовая библиотека-обёртка над API, чтобы не писать запросы вручную.</dd>
+          <dt>Вебхук</dt><dd>«Обратный вызов»: сервис сам присылает POST-запрос на ваш URL, когда случилось событие.</dd>
+        </dl>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="demo.html">&lt;&lt; STAGE 07</a>
+        <a class="nes-btn is-warning" href="about.html">ФИНАЛ →</a>
+      </nav>
+    </section>
+  </main>
+  <aside class="sidebar" aria-label="Боковая панель">
+    <nav class="nes-container stage-dark sb-pad" aria-label="Стадии квеста">
+      <h2 class="sb-h">STAGES</h2>
+      <ul class="side-stages">
+        <li><a href="api-basics.html" data-side="api-basics"><span class="n">01</span>Что такое API</a></li>
+        <li><a href="rest-http.html" data-side="rest-http"><span class="n">02</span>REST и HTTP</a></li>
+        <li><a href="data-formats.html" data-side="data-formats"><span class="n">03</span>JSON и XML</a></li>
+        <li><a href="auth-keys.html" data-side="auth-keys"><span class="n">04</span>Ключи и токены</a></li>
+        <li><a href="frontend.html" data-side="frontend"><span class="n">05</span>Интеграция</a></li>
+        <li><a href="catalog.html" data-side="catalog"><span class="n">06</span>Каталог API</a></li>
+        <li><a href="demo.html" data-side="demo"><span class="n">07</span>Лаборатория</a></li>
+        <li><a href="glossary.html" data-side="glossary"><span class="n">08</span>Глоссарий</a></li>
+        <li><a href="about.html" data-side="about"><span class="n">09</span>О проекте</a></li>
+      </ul>
+    </nav>
+    <section class="nes-container stage-dark monitor sb-pad" aria-label="Монитор прогресса">
+      <h2 class="sb-h">MONITOR</h2>
+      <div class="m-row"><div class="m-head"><span>STAGES CLEAR</span><span id="monCount">0/9</span></div><progress class="nes-progress is-success" id="monBar" value="0" max="9"></progress></div>
+      <div class="m-row"><div class="m-head"><span>LAST STAGE</span><span id="monLast">—</span></div></div>
+    </section>
+    <section class="nes-container side-tip" aria-label="Подсказка стадии">
+      <h2 class="sb-h">TIP</h2>
+      <p class="tip-body" id="sideTip">Пройдите стадии по порядку — прогресс сохраняется в браузере.</p>
+    </section>
+    <section class="nes-container side-tip" aria-label="Подписка на рассылку">
+      <form class="sub-form" id="subForm" novalidate>
+        <h2 class="sb-h">NEWSLETTER</h2>
+        <label for="subEmail">Раз в неделю — разбор одного настоящего API</label>
+        <input class="nes-input" id="subEmail" type="email" placeholder="player@example.com" autocomplete="email">
+        <label class="agree-row"><input type="checkbox" class="nes-checkbox" id="subAgree"><span>Согласен получать письма (демо-режим, адрес хранится только в вашем браузере)</span></label>
+        <p class="field-msg" id="subMsg" hidden></p>
+        <button class="nes-btn is-primary full-btn" type="submit">ПОДПИСАТЬСЯ</button>
+      </form>
+    </section>
+  </aside>
+</div>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <h3>API QUEST</h3>
+      <p>Учебный проект Гарунова Вадима (группа 141-ПМо) по фронтенд-разработке на тему «Использование API-сервисов при разработке сайтов». Собран на HTML5, CSS3, NES.css и нативном JavaScript. Все запросы в лаборатории — настоящие.</p>
+      <p>Сделано с <span class="heart-red" aria-hidden="true">♥</span> и NES.css</p>
+    </div>
+    <nav aria-label="Разделы">
+      <h3>РАЗДЕЛЫ</h3>
+      <ul>
+        <li><a href="api-basics.html">Учебник</a></li>
+        <li><a href="catalog.html">Каталог API</a></li>
+        <li><a href="demo.html">Живая лаборатория</a></li>
+        <li><a href="glossary.html">Глоссарий</a></li>
+        <li><a href="about.html">О проекте</a></li>
+      </ul>
+    </nav>
+    <div>
+      <h3>КОНТАКТЫ</h3>
+      <ul>
+        <li><a href="mailto:sss2905@pochta.com">sss2905@pochta.com</a></li>
+        <li><a href="https://github.com/vadimbd222/api-quest" target="_blank" rel="noopener">GitHub-репозиторий</a></li>
+        <li><a href="https://nostalgic-css.github.io/NES.css/" target="_blank" rel="noopener">Документация NES.css</a></li>
+      </ul>
+    </div>
+  </div>
+  <p class="insert">&copy; <span id="year">2025</span> Гарунов Вадим · 141-ПМо · INSERT COIN TO CONTINUE</p>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+<script src="js/script.js"></script>
+</body>
+</html>

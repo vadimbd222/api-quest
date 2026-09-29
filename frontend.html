@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stage 05 · Интеграция на фронтенде — API QUEST</title>
+<meta name="description" content="Stage 05: fetch, async/await, CORS, состояния загрузки и встраивание видео тегом video.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f7d51d'/%3E%3Crect x='1' y='1' width='14' height='14' fill='none' stroke='%23212529' stroke-width='2'/%3E%3Ctext x='8' y='12' font-family='monospace' font-size='10' font-weight='bold' text-anchor='middle' fill='%23212529'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/nes.css@2.6.0/css/nes.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body data-page="frontend">
+<div class="scanlines" aria-hidden="true"></div>
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="brand" href="index.html" aria-label="API QUEST — на главную"><span class="brand-name">API<em>QUEST</em></span></a>
+    <span class="header-spacer"></span>
+    <nav aria-label="Основная навигация">
+      <ul class="nav-list" id="siteNav">
+        <li><a href="index.html" data-nav="home">ГЛАВНАЯ</a></li>
+        <li><a href="api-basics.html" data-nav="docs">УЧЕБНИК</a></li>
+        <li><a href="catalog.html" data-nav="catalog">КАТАЛОГ</a></li>
+        <li><a href="demo.html" data-nav="demo">ДЕМО</a></li>
+        <li><a href="glossary.html" data-nav="glossary">ГЛОССАРИЙ</a></li>
+        <li><a href="about.html" data-nav="about">О ПРОЕКТЕ</a></li>
+      </ul>
+    </nav>
+    <button type="button" class="crt-toggle" id="crtToggle" aria-pressed="true" title="Переключить CRT-эффект">CRT</button>
+    <button type="button" class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="siteNav" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="layout">
+  <main id="main">
+    <section class="page" aria-labelledby="h1-05">
+      <article class="nes-container doc">
+        <span class="stage-tag">STAGE 05</span>
+        <h1 id="h1-05">Интеграция на фронтенде</h1>
+        <p class="lead">Инструмент номер один для работы с API в браузере — функция <code>fetch()</code>. Она есть в каждом современном браузере и возвращает промис с ответом сервера.</p>
+        <h2>Базовый шаблон</h2>
+        <pre class="codebox"><code><span class="kw">async function</span> <span class="fn">loadFact</span>() {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://catfact.ninja/fact'</span>);
+
+    <span class="cm">// fetch НЕ бросает ошибку на 404/500 — проверяем сами</span>
+    <span class="kw">if</span> (!res.ok) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">'HTTP '</span> + res.status);
+
+    <span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();
+    console.<span class="fn">log</span>(data.fact);
+
+  } <span class="kw">catch</span> (err) {
+    <span class="cm">// сюда попадают и сетевые сбои, и наши throw</span>
+    console.<span class="fn">error</span>(<span class="str">'Запрос не удался:'</span>, err.message);
+  }
+}</code></pre>
+        <h2>Что здесь происходит</h2>
+        <ol>
+          <li><code>fetch(url)</code> отправляет GET-запрос и возвращает промис.</li>
+          <li><code>res.ok</code> — проверяем статус: всё в диапазоне 200–299?</li>
+          <li><code>res.json()</code> читает тело и парсит JSON во второй промис.</li>
+          <li><code>try/catch</code> ловит сетевые ошибки (нет интернета, блокировка, CORS).</li>
+        </ol>
+        <h2>CORS: почему «чужой» API может не отвечать</h2>
+        <p>Браузеры по умолчанию запрещают странице читать ответы с другого домена. Сервер разрешает это специальным заголовком <code>Access-Control-Allow-Origin</code>. Открытые API (как тот, что мы используем в демо) присылают его всегда; если сервис его не отдаёт — запрос делают через свой серверный прокси.</p>
+        <h2>Состояния загрузки</h2>
+        <p>Пока запрос идёт (он занимает сотни миллисекунд), интерфейс не должен «замереть». Минимальный набор состояний: <strong>загрузка</strong> (спиннер или прогресс-бар), <strong>успех</strong> (данные), <strong>ошибка</strong> (сообщение и кнопка «повторить»). Посмотрите на терминал 7-й стадии — там реализованы все три.</p>
+        <h2>Видеоразбор</h2>
+        <p>Короткий видеофрагмент, встроенный тегом HTML5 <code>&lt;video&gt;</code> — тот же способ, которым на страницы встраиваются видеохостинги и веб-плееры. У клипа два источника: если первый недоступен, браузер автоматически пробует второй — так работает механизм <code>&lt;source&gt;</code>:</p>
+        <figure>
+          <video id="apiVideo" controls preload="metadata" width="640" height="360"
+                 poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 36'%3E%3Crect width='64' height='36' fill='%230c2416'/%3E%3Crect x='2' y='2' width='60' height='32' fill='none' stroke='%2392cc41' stroke-width='1' opacity='0.35'/%3E%3Ctext x='6' y='23' font-family='monospace' font-size='13' fill='%2392cc41'%3EAPI%3C/text%3E%3Crect x='30' y='13' width='6' height='11' fill='%2392cc41' opacity='0.8'/%3E%3Crect x='42' y='26' width='14' height='3' fill='%2392cc41' opacity='0.5'/%3E%3C/svg%3E">
+            <source src="https://mdn.github.io/shared-assets/videos/flower.mp4" type="video/mp4">
+            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            Ваш браузер не поддерживает встроенное видео.
+          </video>
+          <p id="videoNote" class="video-note" hidden>Видео не загрузилось — проверьте подключение к интернету и обновите страницу.</p>
+          <figcaption>Открытые тестовые клипы (Blender Foundation, лицензия CC), встроенные тегом &lt;video&gt;. Постер — встроенный SVG, поэтому плеер не выглядит «пустым» даже без сети.</figcaption>
+        </figure>
+      </article>
+      <nav class="stage-nav" aria-label="Навигация по стадиям">
+        <a class="back" href="auth-keys.html">&lt;&lt; STAGE 04</a>
+        <a class="nes-btn is-warning" href="catalog.html">STAGE 06 →</a>
+      </nav>
+    </section>
+  </main>
+  <aside class="sidebar" aria-label="Боковая панель">
+    <nav class="nes-container stage-dark sb-pad" aria-label="Стадии квеста">
+      <h2 class="sb-h">STAGES</h2>
+      <ul class="side-stages">
+        <li><a href="api-basics.html" data-side="api-basics"><span class="n">01</span>Что такое API</a></li>
+        <li><a href="rest-http.html" data-side="rest-http"><span class="n">02</span>REST и HTTP</a></li>
+        <li><a href="data-formats.html" data-side="data-formats"><span class="n">03</span>JSON и XML</a></li>
+        <li><a href="auth-keys.html" data-side="auth-keys"><span class="n">04</span>Ключи и токены</a></li>
+        <li><a href="frontend.html" data-side="frontend"><span class="n">05</span>Интеграция</a></li>
+        <li><a href="catalog.html" data-side="catalog"><span class="n">06</span>Каталог API</a></li>
+        <li><a href="demo.html" data-side="demo"><span class="n">07</span>Лаборатория</a></li>
+        <li><a href="glossary.html" data-side="glossary"><span class="n">08</span>Глоссарий</a></li>
+        <li><a href="about.html" data-side="about"><span class="n">09</span>О проекте</a></li>
+      </ul>
+    </nav>
+    <section class="nes-container stage-dark monitor sb-pad" aria-label="Монитор прогресса">
+      <h2 class="sb-h">MONITOR</h2>
+      <div class="m-row"><div class="m-head"><span>STAGES CLEAR</span><span id="monCount">0/9</span></div><progress class="nes-progress is-success" id="monBar" value="0" max="9"></progress></div>
+      <div class="m-row"><div class="m-head"><span>LAST STAGE</span><span id="monLast">—</span></div></div>
+    </section>
+    <section class="nes-container side-tip" aria-label="Подсказка стадии">
+      <h2 class="sb-h">TIP</h2>
+      <p class="tip-body" id="sideTip">Пройдите стадии по порядку — прогресс сохраняется в браузере.</p>
+    </section>
+    <section class="nes-container side-tip" aria-label="Подписка на рассылку">
+      <form class="sub-form" id="subForm" novalidate>
+        <h2 class="sb-h">NEWSLETTER</h2>
+        <label for="subEmail">Раз в неделю — разбор одного настоящего API</label>
+        <input class="nes-input" id="subEmail" type="email" placeholder="player@example.com" autocomplete="email">
+        <label class="agree-row"><input type="checkbox" class="nes-checkbox" id="subAgree"><span>Согласен получать письма (демо-режим, адрес хранится только в вашем браузере)</span></label>
+        <p class="field-msg" id="subMsg" hidden></p>
+        <button class="nes-btn is-primary full-btn" type="submit">ПОДПИСАТЬСЯ</button>
+      </form>
+    </section>
+  </aside>
+</div>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <h3>API QUEST</h3>
+      <p>Учебный проект Гарунова Вадима (группа 141-ПМо) по фронтенд-разработке на тему «Использование API-сервисов при разработке сайтов». Собран на HTML5, CSS3, NES.css и нативном JavaScript. Все запросы в лаборатории — настоящие.</p>
+      <p>Сделано с <span class="heart-red" aria-hidden="true">♥</span> и NES.css</p>
+    </div>
+    <nav aria-label="Разделы">
+      <h3>РАЗДЕЛЫ</h3>
+      <ul>
+        <li><a href="api-basics.html">Учебник</a></li>
+        <li><a href="catalog.html">Каталог API</a></li>
+        <li><a href="demo.html">Живая лаборатория</a></li>
+        <li><a href="glossary.html">Глоссарий</a></li>
+        <li><a href="about.html">О проекте</a></li>
+      </ul>
+    </nav>
+    <div>
+      <h3>КОНТАКТЫ</h3>
+      <ul>
+        <li><a href="mailto:sss2905@pochta.com">sss2905@pochta.com</a></li>
+        <li><a href="https://github.com/vadimbd222/api-quest" target="_blank" rel="noopener">GitHub-репозиторий</a></li>
+        <li><a href="https://nostalgic-css.github.io/NES.css/" target="_blank" rel="noopener">Документация NES.css</a></li>
+      </ul>
+    </div>
+  </div>
+  <p class="insert">&copy; <span id="year">2025</span> Гарунов Вадим · 141-ПМо · INSERT COIN TO CONTINUE</p>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+<script src="js/script.js"></script>
+</body>
+</html>
