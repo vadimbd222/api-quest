@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link href="https://unpkg.com/nes.css@2.6.0/css/nes.min.css" rel="stylesheet">
 <style>
-/* ============ БАЗА ============ */
+
 :root{
   --bg:#111118; --bg2:#17171f; --ink:#212529; --paper:#ffffff;
   --yellow:#f7d51d; --green:#92cc41; --blue:#209cee; --red:#e76e55;
@@ -39,7 +39,7 @@ img{max-width:100%;height:auto}
 .sprite{display:none}
 [hidden]{display:none!important}
 
-/* ============ CRT-СКАНАЛАЙНЫ ============ */
+
 .scanlines{
   position:fixed;inset:0;pointer-events:none;z-index:60;
   background:repeating-linear-gradient(0deg, rgba(0,0,0,.15) 0 1px, transparent 1px 3px);
@@ -52,7 +52,7 @@ body.crt-off .scanlines{display:none}
 }
 .crt-toggle[aria-pressed="false"]{color:#6d6d78;border-color:#6d6d78}
 
-/* ============ ШАПКА ============ */
+
 .site-header{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:4px solid #000}
 .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:12px 16px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
@@ -89,14 +89,14 @@ body.crt-off .scanlines{display:none}
   .nav-toggle{display:none}
 }
 
-/* ============ СЕТКА СТРАНИЦЫ ============ */
+
 .layout{max-width:1200px;margin:0 auto;padding:18px 16px 40px;display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}
 @media (min-width:768px){.layout{grid-template-columns:minmax(0,1fr) 240px}}
 @media (min-width:992px){.layout{grid-template-columns:minmax(0,1fr) 300px;gap:30px;padding-top:26px}}
 .sidebar{display:grid;gap:22px}
 @media (min-width:768px){.sidebar{position:sticky;top:86px}}
 
-/* ============ СТРАНИЦЫ ============ */
+
 .page{animation:pageIn .28s steps(5) both}
 @keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .doc{background:var(--paper);color:var(--ink);padding:26px 20px 34px;border:4px solid #000;border-radius:0!important}
@@ -119,7 +119,7 @@ body.crt-off .scanlines{display:none}
 .doc ul.nes-list,.doc ol{padding-left:26px}
 .doc li{margin-bottom:8px}
 
-/* код */
+
 .codebox{
   background:var(--panel);color:#e6e6e6;border:4px solid #000;border-radius:0;
   box-shadow:4px 4px 0 rgba(0,0,0,.5);padding:16px 18px;overflow:auto;
@@ -128,7 +128,7 @@ body.crt-off .scanlines{display:none}
 .codebox code{font-family:'IBM Plex Mono',monospace}
 .kw{color:var(--yellow)} .str{color:var(--green)} .fn{color:#7cc7ff} .cm{color:#8a8a96} .nm{color:#e76e55}
 
-/* разбор URL */
+
 .url-demo{
   background:var(--panel);border:4px solid #000;box-shadow:4px 4px 0 rgba(0,0,0,.5);
   padding:16px 18px;font-size:16px;word-break:break-all;margin:20px 0;
@@ -138,14 +138,14 @@ body.crt-off .scanlines{display:none}
 .url-legend dt::before{content:"■ ";font-size:11px}
 .url-legend dd{margin:0 0 6px;font-size:15px}
 
-/* схема клиент-сервер */
+
 .flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:24px 0}
 .flow-node{background:var(--panel);color:#fff;border:4px solid #000;box-shadow:4px 4px 0 rgba(0,0,0,.4);padding:14px 16px;font-family:'Press Start 2P',monospace;font-size:10px;text-align:center;min-width:120px}
 .flow-link{display:grid;gap:6px;font-size:14px;font-weight:600;padding:6px 4px}
 .flow-link .req{color:#3f8f3f;background:#eaf6e0;border:2px solid #3f8f3f;padding:2px 8px}
 .flow-link .res{color:#8a6d00;background:#fdf6d3;border:2px solid #b98f00;padding:2px 8px}
 
-/* таблицы */
+
 .doc .nes-table{font-size:15px;background:#fff}
 .doc caption{caption-side:top;text-align:left;font-family:'Press Start 2P',monospace;font-size:10px;padding-bottom:10px;color:var(--ink)}
 .table-wrap{margin:20px 0}
@@ -154,12 +154,12 @@ body.crt-off .scanlines{display:none}
 .gloss dt{font-family:'Press Start 2P',monospace;font-size:11px;margin-top:20px;padding:6px 8px;background:#fdf6d3;border-left:8px solid var(--yellow);display:inline-block}
 .gloss dd{margin:8px 0 0}
 
-/* навигация между стадиями */
+
 .stage-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;flex-wrap:wrap}
 .stage-nav .back{font-family:'Press Start 2P',monospace;font-size:9px;color:#fff;text-decoration:none}
 .stage-nav .back:hover{color:var(--yellow)}
 
-/* ============ HERO (ГЛАВНАЯ) ============ */
+/*  HERO   */
 .hero{background:var(--paper);color:var(--ink);padding:30px 20px;display:grid;gap:20px;border:4px solid #000;border-radius:0!important}
 @media (min-width:768px){.hero{grid-template-columns:minmax(0,1fr) 260px;align-items:center;padding:40px 36px}}
 @media (min-width:992px){.hero{grid-template-columns:minmax(0,1fr) 320px}}
@@ -172,7 +172,7 @@ body.crt-off .scanlines{display:none}
 .blink{animation:blink 1s steps(2,start) infinite}
 @keyframes blink{to{visibility:hidden}}
 
-/* трек стадий */
+
 .stage-dark{background:var(--panel);border:4px solid #000;border-radius:0!important;box-shadow:6px 6px 0 rgba(0,0,0,.5)}
 .stage-track{list-style:none;margin:8px 0 0;padding:0}
 .stage-track li{position:relative;padding:0 0 20px 48px}
@@ -190,7 +190,7 @@ body.crt-off .scanlines{display:none}
 .stage-desc{margin:6px 0 0;color:var(--text-dim);font-size:15px}
 .cleared-note{color:var(--green);font-size:12px;font-family:'Press Start 2P',monospace;margin-left:8px}
 
-/* ============ САЙДБАР ============ */
+
 .side-stages{list-style:none;margin:0;padding:0;font-size:16px}
 .side-stages li{margin:2px 0}
 .side-stages a{display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;padding:5px 6px}
@@ -211,12 +211,12 @@ body.crt-off .scanlines{display:none}
 .monitor .m-head{display:flex;justify-content:space-between;margin-bottom:4px}
 .monitor progress{width:100%}
 
-/* ============ КАТАЛОГ ============ */
+
 .filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
 .filter-bar .nes-btn{font-size:8px;padding:8px 9px}
 .filter-count{font-weight:600;margin:6px 0 14px}
 
-/* ============ ДЕМО-ТЕРМИНАЛ ============ */
+/*  ДЕМО-ТЕРМИНАЛ  */
 .term{background:var(--panel);border:4px solid #000;border-radius:0!important;box-shadow:6px 6px 0 rgba(0,0,0,.5)}
 .term.with-title>.title{background-color:var(--panel)}
 .term .title{color:var(--yellow)}
@@ -232,10 +232,10 @@ body.crt-off .scanlines{display:none}
 .term-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .term-meta{margin-left:auto;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--text-dim)}
 
-/* ============ ВИДЕО ============ */
+/*  ВИДЕО  */
 .doc video{width:100%;height:auto;border:4px solid #000;box-shadow:4px 4px 0 rgba(0,0,0,.5);background:#000;display:block}
 
-/* ============ ПОДВАЛ ============ */
+/*  ПОДВАЛ  */
 .site-footer{background:var(--panel);border-top:4px solid #000;margin-top:20px}
 .footer-inner{max-width:1200px;margin:0 auto;padding:26px 16px;display:grid;gap:18px;color:var(--text-dim);font-size:15px}
 @media (min-width:768px){.footer-inner{grid-template-columns:2fr 1fr 1fr}}
@@ -247,7 +247,7 @@ body.crt-off .scanlines{display:none}
 .footer-heart svg{width:12px;height:12px;color:var(--red)}
 .insert{text-align:center;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--yellow);margin:0;padding:0 16px 22px}
 
-/* ============ TOAST И BOOT ============ */
+/*  TOAST И BOOT  */
 .toast{
   position:fixed;right:16px;bottom:16px;z-index:80;background:var(--panel);color:#fff;
   border:4px solid #000;box-shadow:5px 5px 0 rgba(0,0,0,.5);padding:14px 18px;
@@ -317,10 +317,9 @@ body.crt-off .scanlines{display:none}
 </header>
 
 <div class="layout">
-  <!-- ================= ОСНОВНОЙ КОНТЕНТ ================= -->
+
   <main id="main">
 
-    <!-- ===== СТРАНИЦА: ГЛАВНАЯ ===== -->
     <section class="page" id="page-home" aria-label="Главная страница" hidden>
       <div class="nes-container hero">
         <div>
@@ -443,7 +442,7 @@ body.crt-off .scanlines{display:none}
       </nav>
     </section>
 
-    <!-- ===== STAGE 01: ЧТО ТАКОЕ API ===== -->
+    <!--  STAGE 01: ЧТО ТАКОЕ API  -->
     <section class="page" id="page-api-basics" aria-labelledby="t-api-basics" hidden>
       <article class="nes-container doc">
         <span class="stage-tag">STAGE 01</span>
@@ -503,7 +502,7 @@ body.crt-off .scanlines{display:none}
       </nav>
     </section>
 
-    <!-- ===== STAGE 02: REST И HTTP ===== -->
+    <!--  STAGE 02: REST И HTTP  -->
     <section class="page" id="page-rest-http" aria-labelledby="t-rest" hidden>
       <article class="nes-container doc">
         <span class="stage-tag">STAGE 02</span>
@@ -582,7 +581,7 @@ body.crt-off .scanlines{display:none}
       </nav>
     </section>
 
-    <!-- ===== STAGE 03: JSON И XML ===== -->
+    <!--  STAGE 03: JSON И XML  -->
     <section class="page" id="page-data-formats" aria-labelledby="t-formats" hidden>
       <article class="nes-container doc">
         <span class="stage-tag">STAGE 03</span>
@@ -643,7 +642,7 @@ console.<span class="fn">log</span>(data.fact); <span class="cm">// "Кошки 
       </nav>
     </section>
 
-    <!-- ===== STAGE 04: КЛЮЧИ И ТОКЕНЫ ===== -->
+    <!--  STAGE 04: КЛЮЧИ И ТОКЕНЫ  -->
     <section class="page" id="page-auth-keys" aria-labelledby="t-auth" hidden>
       <article class="nes-container doc">
         <span class="stage-tag">STAGE 04</span>
@@ -687,7 +686,7 @@ console.<span class="fn">log</span>(data.fact); <span class="cm">// "Кошки 
       </nav>
     </section>
 
-    <!-- ===== STAGE 05: ИНТЕГРАЦИЯ НА ФРОНТЕНДЕ ===== -->
+    <!--  STAGE 05: ИНТЕГРАЦИЯ НА ФРОНТЕНДЕ  -->
     <section class="page" id="page-frontend" aria-labelledby="t-frontend" hidden>
       <article class="nes-container doc">
         <span class="stage-tag">STAGE 05</span>
@@ -743,7 +742,7 @@ console.<span class="fn">log</span>(data.fact); <span class="cm">// "Кошки 
       </nav>
     </section>
 
-    <!-- ===== STAGE 06: КАТАЛОГ API ===== -->
+    <!--  STAGE 06: КАТАЛОГ API  -->
     <section class="page" id="page-catalog" aria-labelledby="t-catalog" hidden>
       <article class="nes-container doc">
         <span class="stage-tag">STAGE 06</span>
@@ -793,7 +792,7 @@ console.<span class="fn">log</span>(data.fact); <span class="cm">// "Кошки 
       </nav>
     </section>
 
-    <!-- ===== STAGE 07: ЖИВАЯ ЛАБОРАТОРИЯ ===== -->
+    <!--  STAGE 07: ЖИВАЯ ЛАБОРАТОРИЯ  -->
     <section class="page" id="page-demo" aria-labelledby="t-demo" hidden>
       <article class="nes-container doc">
         <span class="stage-tag">STAGE 07</span>
@@ -834,7 +833,7 @@ console.<span class="fn">log</span>(data.fact); <span class="cm">// "Кошки 
       </nav>
     </section>
 
-    <!-- ===== STAGE 08: ГЛОССАРИЙ ===== -->
+    <!--  STAGE 08: ГЛОССАРИЙ  -->
     <section class="page" id="page-glossary" aria-labelledby="t-gloss" hidden>
       <article class="nes-container doc">
         <span class="stage-tag">STAGE 08</span>
@@ -864,7 +863,7 @@ console.<span class="fn">log</span>(data.fact); <span class="cm">// "Кошки 
       </nav>
     </section>
 
-    <!-- ===== ФИНАЛ: О ПРОЕКТЕ ===== -->
+    
     <section class="page" id="page-about" aria-labelledby="t-about" hidden>
       <article class="nes-container doc">
         <span class="stage-tag">FINAL STAGE</span>
@@ -915,7 +914,7 @@ console.<span class="fn">log</span>(data.fact); <span class="cm">// "Кошки 
       </nav>
     </section>
 
-    <!-- ===== 404 ===== -->
+    <!--  404  -->
     <section class="page" id="page-404" aria-label="Страница не найдена" hidden>
       <div class="nes-container hero">
         <div>
@@ -946,7 +945,7 @@ console.<span class="fn">log</span>(data.fact); <span class="cm">// "Кошки 
     </section>
   </main>
 
-  <!-- ================= САЙДБАР ================= -->
+  <!--  САЙДБАР  -->
   <aside class="sidebar" aria-label="Боковая панель">
     <nav class="nes-container stage-dark" style="padding:16px" aria-label="Стадии квеста">
       <h2 style="font-size:11px;color:var(--yellow);margin:0 0 12px">STAGES</h2>
@@ -995,7 +994,7 @@ console.<span class="fn">log</span>(data.fact); <span class="cm">// "Кошки 
   </aside>
 </div>
 
-<!-- ================= ПОДВАЛ ================= -->
+<!--  ПОДВАЛ  -->
 <footer class="site-footer">
   <div class="footer-inner">
     <div>
@@ -1032,13 +1031,13 @@ console.<span class="fn">log</span>(data.fact); <span class="cm">// "Кошки 
 const $  = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 
-/* ---------- хранилище ---------- */
+/*  хранилище  */
 const store = {
   get(k, d){ try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
   set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
 };
 
-/* ---------- toast ---------- */
+/*  toast  */
 let toastTimer;
 function toast(msg){
   const t = $('#toast');
@@ -1048,7 +1047,7 @@ function toast(msg){
   toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
 }
 
-/* ---------- boot-экран ---------- */
+/*  boot-экран  */
 (function boot(){
   const box = $('#boot'), bar = $('#bootBar'), pct = $('#bootPct');
   let finished = false;
@@ -1065,7 +1064,7 @@ function toast(msg){
   setTimeout(end, 4500);
 })();
 
-/* ---------- CRT-тумблер ---------- */
+/*  CRT-тумблер  */
 const crtBtn = $('#crtToggle');
 function applyCrt(on){
   document.body.classList.toggle('crt-off', !on);
@@ -1075,7 +1074,7 @@ function applyCrt(on){
 crtBtn.addEventListener('click', () => applyCrt(document.body.classList.contains('crt-off')));
 applyCrt(store.get('apiquest-crt', true));
 
-/* ---------- бургер-меню ---------- */
+/*  бургер-меню  */
 const header = $('#siteHeader'), navToggle = $('#navToggle');
 navToggle.addEventListener('click', () => {
   const open = header.classList.toggle('menu-open');
@@ -1083,7 +1082,7 @@ navToggle.addEventListener('click', () => {
   navToggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
 });
 
-/* ---------- роутер ---------- */
+/*  роутер  */
 const ROUTES = {
   'index.html':        { el: 'page-home',         nav: 'home',    stage: null,                title: 'API QUEST — учебный сайт об API-сервисах' },
   'api-basics.html':   { el: 'page-api-basics',   nav: 'docs',    stage: 'api-basics.html',   title: 'Stage 01 · Что такое API — API QUEST' },
@@ -1168,13 +1167,13 @@ function navigate(){
 }
 window.addEventListener('hashchange', navigate);
 
-/* ---------- плавный скролл по кнопкам с data-scroll ---------- */
+
  $$('[data-scroll]').forEach(btn => btn.addEventListener('click', () => {
   const t = document.querySelector(btn.dataset.scroll);
   if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }));
 
-/* ---------- каталог: фильтр ---------- */
+/*  каталог: фильтр  */
 const fBtns = $$('.filter-btn');
 const apiRows = $$('#apiTable tbody tr');
 const fCount = $('#filterCount');
@@ -1190,7 +1189,7 @@ function applyFilter(cat){
 }
 fBtns.forEach(b => b.addEventListener('click', () => applyFilter(b.dataset.cat)));
 
-/* ---------- терминал: живой запрос к API ---------- */
+/*  терминал: живой запрос к API  */
 const termLog = $('#termLog'), termMeta = $('#termMeta');
 const busyBtns = ['#btnFact', '#btn404'];
 let busy = false;
@@ -1256,7 +1255,7 @@ async function callApi(url){
   termMeta.textContent = 'IDLE';
 });
 
-/* ---------- подписка ---------- */
+
  $('#subForm').addEventListener('submit', e => {
   e.preventDefault();
   const email = $('#subEmail').value.trim();
@@ -1274,8 +1273,7 @@ async function callApi(url){
   e.target.reset();
 });
 
-/* ---------- фолбэк иллюстраций: если внешний хост недоступен —
-   подставляем встроенную пиксельную SVG-картинку ---------- */
+
 const IMG_FALLBACK = {
   'apiquest-network': "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 40' shape-rendering='crispEdges'%3E%3Crect width='80' height='40' fill='%2317171f'/%3E%3Cpath d='M40 12 V18 M16 18 H64 M20 18 V26 M40 18 V26 M60 18 V26' stroke='%233a3a46' stroke-width='2'/%3E%3Crect x='36' y='4' width='8' height='8' fill='%23f7d51d'/%3E%3Crect x='38' y='6' width='2' height='2' fill='%2317171f'/%3E%3Crect x='42' y='6' width='2' height='2' fill='%2317171f'/%3E%3Crect x='16' y='26' width='8' height='8' fill='%2392cc41'/%3E%3Crect x='36' y='26' width='8' height='8' fill='%23209cee'/%3E%3Crect x='56' y='26' width='8' height='8' fill='%23e76e55'/%3E%3Crect x='38' y='19' width='4' height='2' fill='%23f7d51d'/%3E%3Crect x='18' y='21' width='4' height='2' fill='%2392cc41'/%3E%3Crect x='58' y='21' width='4' height='2' fill='%23e76e55'/%3E%3C/svg%3E",
   'api-port': "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 40' shape-rendering='crispEdges'%3E%3Crect width='80' height='40' fill='%2317171f'/%3E%3Cpath d='M24 20 H34 V28 H46 V20 H56' stroke='%23f7d51d' stroke-width='3' fill='none'/%3E%3Crect x='8' y='10' width='16' height='14' fill='%23209cee'/%3E%3Crect x='11' y='13' width='10' height='6' fill='%230c2416'/%3E%3Crect x='12' y='30' width='8' height='3' fill='%233a3a46'/%3E%3Crect x='56' y='10' width='16' height='14' fill='%2392cc41'/%3E%3Crect x='59' y='13' width='10' height='6' fill='%230c2416'/%3E%3Crect x='60' y='30' width='8' height='3' fill='%233a3a46'/%3E%3C/svg%3E"
@@ -1290,14 +1288,13 @@ const IMG_FALLBACK = {
     img.src = IMG_FALLBACK[img.dataset.fb];
   };
   img.addEventListener('error', swap);
-  /* если хост молчит (не ошибка, а зависший запрос) — подменяем через 7 секунд */
+
   window.setTimeout(() => {
     if (!(img.complete && img.naturalWidth > 0)) swap();
   }, 7000);
 });
 
-/* ---------- фолбэк видео: если оба источника недоступны —
-   показываем подсказку вместо молчащего чёрного плеера ---------- */
+
 (function(){
   const v = $('#apiVideo');
   if (!v) return;
@@ -1308,20 +1305,20 @@ const IMG_FALLBACK = {
     failed = true;
     if (note) note.hidden = false;
   };
-  /* true на третьем аргументе — ловим событие error от дочерних <source> */
+  
   v.addEventListener('error', () => {
     if (v.error || v.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) showFail();
   }, true);
-  /* страховка: если через 12 секунд видео так и не начало грузиться */
+  /* если через 12 секунд видео так и не начало грузиться */
   window.setTimeout(() => {
     if (v.readyState === 0 && (v.networkState === HTMLMediaElement.NETWORK_NO_SOURCE || v.error)) showFail();
   }, 12000);
 })();
 
-/* ---------- год в подвале ---------- */
+/*  год в подвале  */
  $('#year').textContent = new Date().getFullYear();
 
-/* ---------- старт ---------- */
+/*  старт  */
 applyFilter('all');
 navigate();
 </script>
