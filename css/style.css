@@ -1,0 +1,150 @@
+:root{--bg:#111118;--paper:#fff;--yellow:#f7d51d;--green:#92cc41;--red:#e76e55;--dim:#c9c9d4;--panel:#1b1b24}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:#e8e8ee;font:16px/1.65 "IBM Plex Mono",monospace;background:var(--bg)}
+[hidden]{display:none!important}
+h1,h2,h3{font-family:"Press Start 2P",monospace;line-height:1.5}
+.scanlines{position:fixed;inset:0;pointer-events:none;z-index:60;background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 1px,transparent 1px 3px)}
+body.crt-off .scanlines{display:none}
+.crt-toggle{font:8px "Press Start 2P",monospace;cursor:pointer;background:none;color:var(--green);border:3px solid #fff;padding:6px 8px}
+.crt-toggle[aria-pressed="false"]{color:#6d6d78;border-color:#6d6d78}
+.site-header{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:4px solid #000}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:12px 16px}
+.brand{display:flex;text-decoration:none}
+.brand-name{font:13px "Press Start 2P",monospace;color:#fff}
+.brand-name em{font-style:normal;color:var(--yellow)}
+.header-spacer{flex:1}
+.nav-list{display:none;list-style:none;margin:0;padding:0}
+.nav-list a{display:block;font:9px "Press Start 2P",monospace;color:#fff;text-decoration:none;padding:9px 10px}
+.nav-list a:hover{color:var(--yellow)}
+.nav-list a.is-active{background:var(--yellow);color:#000}
+.nav-toggle{display:inline-flex;flex-direction:column;justify-content:center;gap:4px;width:46px;height:40px;background:var(--panel);border:3px solid #fff;cursor:pointer;padding:8px}
+.nav-toggle span{width:100%;height:3px;background:#fff}
+.menu-open .nav-toggle span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.menu-open .nav-toggle span:nth-child(2){opacity:0}
+.menu-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.layout{max-width:1200px;margin:0 auto;padding:18px 16px 40px;display:grid;gap:24px;align-items:start}
+.sidebar{display:grid;gap:22px}
+.sb-pad{padding:16px}
+.sb-h{font-size:11px;color:var(--yellow);margin:0 0 12px}
+.side-tip .sb-h{color:var(--ink)}
+.sb-h--lg{font-size:13px}
+.stage-intro{color:var(--dim);font-size:15px;margin:0 0 18px}
+.mt-26{margin-top:26px}
+.pad-dark{padding:24px 20px 28px}
+.doc{background:var(--paper);color:var(--ink);padding:26px 20px 34px;border:4px solid #000}
+.doc h1{font-size:19px;margin:0 0 18px}
+.doc h2{font-size:13px;margin:38px 0 14px;padding-left:12px;border-left:8px solid var(--yellow)}
+.doc h3{font-size:11px;margin:26px 0 10px}
+.doc p{margin:0 0 14px}
+.lead{font-weight:600;font-size:17px}
+.doc a{color:#0a5fae;font-weight:600}
+.doc figure{margin:22px 0}
+.doc figcaption,.doc-note{font-size:14px;color:#555}
+.doc ul.nes-list,.doc ol{padding-left:26px}
+.stage-tag{display:inline-block;font:10px "Press Start 2P",monospace;background:var(--yellow);color:#000;padding:7px 11px;border:4px solid #000;margin-bottom:18px}
+.pixel-img{image-rendering:pixelated;border:4px solid #000;display:block}
+.codebox{background:var(--panel);color:#e6e6e6;border:4px solid #000;padding:16px 18px;overflow:auto;font-size:14px;white-space:pre}
+.kw,.u-proto,.t-key{color:var(--yellow)}
+.str,.u-path,.t-str{color:var(--green)}
+.fn,.u-host,.t-num{color:#7cc7ff}
+.u-query,.t-err,.t-bool{color:var(--red)}
+.cm,.t-dim{color:#8a8a96}
+.url-demo{background:var(--panel);border:4px solid #000;padding:16px 18px;font-size:16px;word-break:break-all;margin:20px 0}
+.url-legend dt{font-weight:600;margin-top:8px}
+.url-legend dd{margin:0 0 6px;font-size:15px}
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:24px 0}
+.flow-node{background:var(--panel);color:#fff;border:4px solid #000;padding:14px 16px;font:10px "Press Start 2P",monospace;text-align:center}
+.flow-link{display:grid;gap:6px;font-size:14px;font-weight:600}
+.req{color:#3f8f3f;background:#eaf6e0;padding:2px 8px}
+.res{color:#8a6d00;background:#fdf6d3;padding:2px 8px}
+.doc .nes-table{font-size:15px;background:#fff}
+.doc caption{caption-side:top;text-align:left;font:10px "Press Start 2P",monospace;padding-bottom:10px;color:var(--ink)}
+.table-wrap{overflow-x:auto;margin:20px 0}
+.gloss dt{font:11px "Press Start 2P",monospace;padding:6px 8px;background:#fdf6d3;border-left:8px solid var(--yellow);display:inline-block}
+.gloss dd{margin:8px 0 0}
+.stage-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;flex-wrap:wrap}
+.stage-nav .back{font:9px "Press Start 2P",monospace;color:#fff;text-decoration:none}
+.stage-nav .back:hover{color:var(--yellow)}
+.hero{background:var(--paper);color:var(--ink);padding:30px 20px;display:grid;gap:20px;border:4px solid #000}
+.hero h1{font-size:26px}
+.hero .tagline{font-size:17px;font-weight:600;margin-bottom:20px}
+.hero-badges,.hero-actions{display:flex;flex-wrap:wrap;gap:12px}
+.tv{width:100%;max-width:320px;justify-self:center}
+.blink{animation:blink 1s steps(2,start) infinite}
+@keyframes blink{to{visibility:hidden}}
+.stage-dark{background:var(--panel);border:4px solid #000}
+.stage-track{list-style:none;margin:8px 0 0;padding:0}
+.stage-track li{position:relative;padding:0 0 20px 48px}
+.stage-track li::before{content:"";position:absolute;left:15px;top:30px;bottom:0;border-left:4px dashed #3a3a46}
+.stage-num{position:absolute;left:0;top:0;width:32px;height:32px;display:grid;place-items:center;font:10px "Press Start 2P",monospace;background:var(--yellow);border:3px solid #000}
+.stage-track li.cleared .stage-num{background:var(--green)}
+.stage-link{font:11px "Press Start 2P",monospace;color:#fff;text-decoration:none}
+.stage-desc{color:var(--dim);font-size:15px;margin:6px 0 0}
+.cleared-note{color:var(--green);font:12px "Press Start 2P",monospace}
+.side-stages{list-style:none;margin:0;padding:0;font-size:16px}
+.side-stages a{display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;padding:5px 6px}
+.side-stages a:hover{color:var(--yellow)}
+.side-stages .n{font:8px "Press Start 2P",monospace;color:var(--yellow)}
+.side-stages a.done{color:var(--green)}
+.side-stages a.done::after{content:"★";margin-left:auto}
+.side-tip{background:#fff;color:var(--ink);font-size:15px}
+.tip-body{margin:0}
+.sub-form label{display:block;font-size:14px;margin-bottom:6px}
+.sub-form .nes-input{width:100%;border-radius:0}
+.agree-row{display:flex;gap:8px;font-size:14px;margin-top:10px}
+.field-msg{color:var(--red);font-size:14px;margin:8px 0 0}
+.is-invalid{border-color:var(--red)}
+.full-btn{width:100%;margin-top:6px}
+.monitor .m-row{margin-bottom:12px;font-size:14px}
+.monitor .m-head{display:flex;justify-content:space-between}
+.monitor progress{width:100%}
+.filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.filter-bar .nes-btn{font-size:8px;padding:8px 9px}
+.filter-count{font-weight:600;margin:6px 0 14px}
+.term{background:var(--panel);border:4px solid #000}
+.term.with-title>.title{background-color:var(--panel)}
+.term .title{color:var(--yellow)}
+.term-log{background:#0c0c11;border:3px solid #000;min-height:210px;max-height:380px;overflow:auto;padding:14px;font-size:14px;margin-bottom:14px}
+.term-log div{white-space:pre-wrap;word-break:break-word;margin-bottom:10px}
+.t-json{color:#e6e6e6}
+.t-cmd{color:var(--yellow)}
+.t-ok{color:var(--green)}
+.term-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.term-meta{margin-left:auto;font:9px "Press Start 2P",monospace;color:var(--dim)}
+.doc video{width:100%;border:4px solid #000;background:#000;display:block}
+.video-note{color:var(--red);font-size:14px;margin:8px 0 0}
+.site-footer{background:var(--panel);border-top:4px solid #000;margin-top:20px}
+.footer-inner{max-width:1200px;margin:0 auto;padding:26px 16px;display:grid;gap:18px;color:var(--dim);font-size:15px}
+.footer-inner h3{font-size:10px;color:var(--yellow)}
+.footer-inner ul{list-style:none;margin:0;padding:0}
+.footer-inner a{color:#fff;text-decoration:none}
+.footer-inner a:hover{color:var(--yellow)}
+.heart-red{color:var(--red)}
+.insert{text-align:center;font:9px "Press Start 2P",monospace;color:var(--yellow)}
+.toast{position:fixed;right:16px;bottom:16px;z-index:80;background:var(--panel);color:#fff;border:4px solid #000;padding:14px 18px;font:9px "Press Start 2P",monospace;transform:translateY(150%)}
+.toast.show{transform:none}
+.boot{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center}
+.boot.done{display:none}
+.boot-box{text-align:center}
+.boot-title{font:20px "Press Start 2P",monospace;color:#fff}
+.boot-title em{font-style:normal;color:var(--yellow)}
+.boot-sub{font:9px "Press Start 2P",monospace;color:var(--dim);margin:0 0 24px}
+.boot progress{width:100%}
+.boot-skip{font-size:13px;color:var(--dim)}
+@media(min-width:768px){
+  .layout{grid-template-columns:minmax(0,1fr) 240px}
+  .sidebar{position:sticky;top:86px}
+  .hero{grid-template-columns:minmax(0,1fr) 260px;align-items:center}
+  .footer-inner{grid-template-columns:2fr 1fr 1fr}
+}
+@media(min-width:992px){
+  .nav-list{display:flex;gap:4px}
+  .nav-toggle{display:none}
+  .layout{grid-template-columns:minmax(0,1fr) 300px;padding-top:26px}
+  .hero h1{font-size:36px}
+  .doc h1{font-size:26px}
+}
+@media(max-width:991.98px){
+  .menu-open .nav-list{display:flex;flex-direction:column;gap:8px;position:absolute;left:0;right:0;top:100%;background:var(--panel);padding:12px 16px}
+}
